@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
+use Database\Factories\CategoryFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -17,15 +18,20 @@ class PostSeeder extends Seeder
      */
     public function run()
     {
-        Post::factory()
-                ->count(50)
-                ->create();
-        $list = [];
-        for($i = 0; $i <= 50; $i++)
-        {
-            array_push($list, ['post_id'=>rand(1,10), 'tags_id'=>rand(1,10)]);
+        $categories = Category::all();
+        $tags = Tag::all();
+
+        foreach (range(1, 50) as $_) {
+            Post::factory()->for(Category::factory(), 'category')->create();
         }
-        
-        DB::table('pivot_post_and_tag')->insert($list);
+
+        $posts = Post::all();
+
+        foreach ($posts as $post)
+        {
+            $post->tags()
+                ->attach($tags->random(rand(1, 3))->pluck('id')->toArray()
+                );
+        }
     }
 }

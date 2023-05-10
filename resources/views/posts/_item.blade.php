@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header">
         <div class="d-flex justify-content-between align-items-center">
-            <a href="{{route('posts.show', ['post'=>$post->id])}}"><h2>{{$post->title}}</h2></a>
+            <a href="{{route('posts.show', $post )}}"><h2>{{$post->title}}</h2></a>
 
             <h6>{{$post->created_at->format('d/m/Y \a\t H:i')}}</h6>
         </div>

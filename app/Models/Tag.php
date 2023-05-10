@@ -38,7 +38,7 @@ class Tag extends Model
     */
     public function posts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, 'pivot_post_and_tag', 'tags_id', 'post_id');
+        return $this->belongsToMany(Post::class);
     }
     /*
     |--------------------------------------------------------------------------

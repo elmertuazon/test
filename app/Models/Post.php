@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -14,16 +15,15 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $table = 'post';
     protected $guarded = ['id'];
 
-    public function category(): HasOne
+    public function category(): BelongsTo
     {
-        return  $this->hasOne(Category::class, 'id', 'category_id');
+        return  $this->belongsTo(Category::class);
     }
 
     public function tags(): BelongsToMany
     {
-        return $this->belongsToMany(Tag::class, 'pivot_post_and_tag', 'post_id', 'tags_id');
+        return $this->belongsToMany(Tag::class);
     }
 }
