@@ -10,6 +10,6 @@ class PostRepository implements IPostRepository
     {
         // echo json_encode(Post::with('category', 'tags')->where('id', 1)->get());
         // die();
-        return Post::with('category', 'tags')->paginate(10);
+        return Post::with('category', 'tags')->paginate(config('blog.posts_per_page'));
     }
 }
