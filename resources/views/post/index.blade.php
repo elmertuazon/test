@@ -2,12 +2,12 @@
 
 @section('content')
     <div class="row">
-        @foreach ($data as $item)
+        @foreach ($posts as $post)
             <div class="col-12 mb-4">
-                @include('post._item', ['item' => $item])
+                @include('post._item')
             </div>
         @endforeach
     </div>
 
-    {{ $data->links() }}
+    {{ $posts->links() }}
 @endsection

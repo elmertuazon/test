@@ -8,7 +8,7 @@
     </div>
     <div class="row">
         <div class="col-12">
-            @include('post._item', ['item' => $data])
+            @include('post._item')
         </div>
     </div>
 @endsection
