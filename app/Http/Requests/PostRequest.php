@@ -25,7 +25,11 @@ class PostRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+             'title' => ['required', 'min:5', 'max:255'],
+             'introduction' => ['required', 'min:5', 'max:255'],
+             'body' => ['required', 'min:5', 'max:255'],
+             'author_id' => ['required', 'exists:users,id'],
+             'category_id' => ['required', 'exists:categories,id'],
         ];
     }
 

@@ -10,7 +10,6 @@ class Category extends Model
 {
     use CrudTrait, HasFactory;
 
-    protected $table = 'category';
     protected $guarded = ['id'];
 
     public function posts(): HasMany

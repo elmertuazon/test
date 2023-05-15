@@ -6,6 +6,7 @@ use App\Http\Requests\PostRequest;
 use App\Models\Category;
 use App\Models\PostTag;
 use App\Models\Tag;
+use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -24,7 +25,7 @@ class PostCrudController extends CrudController
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
-     * 
+     *
      * @return void
      */
     public function setup()
@@ -36,7 +37,7 @@ class PostCrudController extends CrudController
 
     /**
      * Define what happens when the List operation is loaded.
-     * 
+     *
      * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
      * @return void
      */
@@ -71,37 +72,78 @@ class PostCrudController extends CrudController
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
-         * - CRUD::addColumn(['name' => 'price', 'type' => 'number']); 
+         * - CRUD::addColumn(['name' => 'price', 'type' => 'number']);
          */
     }
 
     /**
      * Define what happens when the Create operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-create
      * @return void
      */
     protected function setupCreateOperation()
     {
-        $this->crud->setFromDb();
-        $this->crud->removeFields(['category_id']);
         CRUD::setValidation(PostRequest::class);
+
         $this->crud->addField([
-            'name'=>'category',
-            'type'=>'select',
-            'label'=>'Category',
-            'entity'=>'category',
-            'model'=>Category::class,
-            'attribute'=>'name'
+            'name' => 'title'
         ]);
+
         $this->crud->addField([
-            'label'=>'Tags',
-            'type'=>'select_multiple',
-            'name'=>'tags',
-            'entity'=>'tags',
-            'model'=>Tag::class,
-            'attribute'=>'name',
-            'pivot'=>true
+            'name' => 'introduction',
+        ]);
+
+        $this->crud->addField([   // CKEditor
+            'name' => 'body',
+            'label' => 'Post Body',
+            'type' => 'ckeditor',
+
+            // optional:
+            'extra_plugins' => ['widget'],
+            'options' => [
+                'height' => 400,
+                'autoGrow_minHeight' => 200,
+                'autoGrow_bottomSpace' => 50,
+                'removePlugins' => 'resize,maximize',
+            ]
+        ]);
+
+        $this->crud->addField([
+            'name' => 'author_id',
+            'type' => 'select2',
+            'label' => 'Author',
+            'entity' => 'author',
+            'model' => User::class,
+            'attribute' => 'name',
+            'wrapperAttributes' => [
+                'class' => 'col-md-4'
+            ]
+        ]);
+
+        $this->crud->addField([
+            'name' => 'category_id',
+            'type' => 'select2',
+            'label' => 'Category',
+            'entity' => 'category',
+            'model' => Category::class,
+            'attribute' => 'name',
+            'wrapperAttributes' => [
+                'class' => 'col-md-4'
+            ]
+        ]);
+
+        $this->crud->addField([
+            'label' => 'Tags',
+            'type' => 'select2_multiple',
+            'name' => 'tags',
+            'entity' => 'tags',
+            'model' => Tag::class,
+            'attribute' => 'name',
+            'pivot' => true,
+            'wrapperAttributes' => [
+                'class' => 'col-md-4'
+            ]
         ]);
         // CRUD::field('id');
         // CRUD::field('title');
@@ -115,13 +157,13 @@ class PostCrudController extends CrudController
         /**
          * Fields can be defined using the fluent syntax or array syntax:
          * - CRUD::field('price')->type('number');
-         * - CRUD::addField(['name' => 'price', 'type' => 'number'])); 
+         * - CRUD::addField(['name' => 'price', 'type' => 'number']));
          */
     }
 
     /**
      * Define what happens when the Update operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-update
      * @return void
      */
