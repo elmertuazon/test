@@ -5,7 +5,7 @@
 
             <h6>{{$post->created_at->format('d/m/Y \a\t H:i')}}</h6>
         </div>
-        <h6>By {{$post->author}}</h6>
+        <h6>By {{$post->author->name}}</h6>
     </div>
     <div class="card-body">
         <p>Introduction {{$post->introduction}}</p>

@@ -44,36 +44,44 @@ class PostCrudController extends CrudController
     protected function setupListOperation()
     {
         // $this->crud->setFromDb();
-        $this->crud->addColumns(['title', 'tags', 'category']);
-        // CRUD::column('id');
-        // CRUD::column('title');
-        // CRUD::column('introduction');
-        // CRUD::column('body');
-        // CRUD::column('author');
-        // CRUD::column('category_id');
-        // CRUD::column('created_at');
-        // CRUD::column('updated_at');
-        // $this->crud->addColumn([
-        //     'label' => "Category",
-        //     'type' => 'select',
-        //     'name' => 'category',
-        //     'entity' => 'category',
-        //     'attribute' => 'name',
-        //     'model' => Category::class
-        //  ]);
-        //  $this->crud->addColumn([
-        //     'label' => "Tags",
-        //     'type' => 'select',
-        //     'name' => 'tags',
-        //     'entity' => 'tags',
-        //     'attribute' => 'name',
-        //     'model' => Tag::class
-        //  ]);
-        /**
-         * Columns can be defined using the fluent syntax or array syntax:
-         * - CRUD::column('price')->type('number');
-         * - CRUD::addColumn(['name' => 'price', 'type' => 'number']);
-         */
+        $this->crud->addColumn([
+            'name' => 'title',
+            'limit' => 50,
+        ]);
+
+        $this->crud->addColumn([
+            'name' => 'introduction',
+            'limit' => 50,
+        ]);
+
+        $this->crud->addColumn([
+            'name' => 'category',
+            'type' => 'relationship',
+            'label' => 'Category',
+            'entity'    => 'category',
+            'attribute' => 'name',
+            'model'     => App\Models\Category::class, // foreign key model
+        ]);
+
+        $this->crud->addColumn([
+            'name' => 'author', // the method that defines the relationship in your Model
+            'type' => 'relationship', // <<- this is the same always for relationship columns
+            'label' => 'Author', // Table column heading
+            'entity'    => 'author', // the method that defines the relationship in your Model
+            'attribute' => 'name', // The column from the foreign table that you want to show
+            'model'     => App\Models\User::class, // foreign key model
+        ]);
+
+        $this->crud->addColumn([
+            'name' => 'tags',
+            'type' => 'relationship',
+            'label' => 'Tags',
+            'entity'    => 'tags',
+            'attribute' => 'name',
+            'model'     => App\Models\Tag::class,
+        ]);
+
+
     }
 
     /**
