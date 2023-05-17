@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddUserIdToPostsTable extends Migration
+class AddPublishAtToPostTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddUserIdToPostsTable extends Migration
     public function up()
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->unsignedBigInteger("author_id")->after("id");
+            $table->timestamp('publish_at')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddUserIdToPostsTable extends Migration
     public function down()
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->dropColumn("author_id");
+            $table->dropColumn("publish_at");
         });
     }
 }
