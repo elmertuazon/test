@@ -14,8 +14,8 @@
     </div>
     <div class="card-footer">
         <div class="d-flex justify-content-between align-items-center">
-            <h6>Categorised as <strong>{{$post->category->name}}</strong></h6>
-            <h6>Tags {{ $post->tags->map(fn($tag) => "#$tag->name")->join(', ') }}</h6>
+            <h6>Categorised as <a href="{{ route('category.show', $post->category) }}"><strong>{{$post->category->name}}</strong></a></h6>
+            <h6>Tags {!! $post->tagsAsLinks() !!}</h6>
         </div>
     </div>
 </div>

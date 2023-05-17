@@ -31,11 +31,11 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public static function findByTagId(Tag $tag): LengthAwarePaginator
+    // Methods
+    public function tagsAsLinks()
     {
-        return self::select('posts.*')
-        ->join('post_tag', 'post_tag.post_id', '=', 'posts.id')
-        ->where('post_tag.tag_id', $tag->id)
-        ->paginate(config('blog.posts_per_page'));
+        return $this->tags->map(function ($tag) {
+            return '<a href="' . route('tag.show', $tag) . '">#' . $tag->name . '</a>';
+        })->implode(', ');
     }
 }
