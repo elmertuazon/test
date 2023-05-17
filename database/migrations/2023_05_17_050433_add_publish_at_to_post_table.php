@@ -14,7 +14,7 @@ class AddPublishAtToPostTable extends Migration
     public function up()
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->timestamp('publish_at')->nullable();
+            $table->timestamp('publish_at')->nullable()->after('category_id');
         });
     }
 
