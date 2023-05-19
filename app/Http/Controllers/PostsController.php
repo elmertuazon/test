@@ -11,13 +11,14 @@ class PostsController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('category', 'tags')->paginate(config('blog.posts_per_page'));
+        $posts = Post::with('category', 'tags')->published()->paginate(config('blog.posts_per_page'));
 
         return view('posts.index', compact('posts'));
     }
 
     public function show(Post $post)
     {
+        abort_if($post->publish_at > now(), 404);
         return view('posts.show', compact('post'));
     }
 }

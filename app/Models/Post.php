@@ -39,8 +39,8 @@ class Post extends Model
         })->implode(', ');
     }
 
-    public function scopePublishAt($query)
+    public function scopePublished($query)
     {
-        return $query->whereDate('publish_at', '<=', date('Y-m-d'));
+        return $query->where('publish_at', '<=', now());
     }
 }
