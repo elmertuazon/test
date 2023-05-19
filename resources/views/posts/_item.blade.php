@@ -8,9 +8,12 @@
         <h6>By {{$post->author->name}}</h6>
     </div>
     <div class="card-body">
-        <p>Introduction {{$post->introduction}}</p>
         <div class="fakeimg" style="height:200px;">Image</div>
-        <p>{{$post->body}}</p>
+        <h4 class="mt-4"><em>Introduction {{$post->introduction}}</em></h4>
+
+        <div class="mt-4">
+            <p>{!! nl2br($post->body) !!}</p>
+        </div>
     </div>
     <div class="card-footer">
         <div class="d-flex justify-content-between align-items-center">

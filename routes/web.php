@@ -21,5 +21,3 @@ Route::get('/categories/{category:slug}', CategoryShowController::class)->name('
 Route::get('/tags/{tag:slug}', TagShowController::class)->name('tag.show');
 
 Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

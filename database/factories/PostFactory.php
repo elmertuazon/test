@@ -20,7 +20,7 @@ class PostFactory extends Factory
         return [
             'title' => $this->faker->sentence(),
             'introduction' => $this->faker->sentences(2, true),
-            'body' => $this->faker->paragraph(),
+            'body' => $this->faker->paragraphs(10, true),
             'author_id' => User::factory(),
             'category_id' => Category::factory(),
             'publish_at' => now()->subDays(1)

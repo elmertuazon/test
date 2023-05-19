@@ -1,7 +1,7 @@
-@extends('layouts.blog_app')
+@extends('layouts.app')
 
 @section('content')
-    
+
     <div class="row">
         <div>
             <div class="col-12 mb-4">
