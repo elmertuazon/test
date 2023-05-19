@@ -14,8 +14,8 @@ class TagShowController extends Controller
 
         // posts -> Load a collection of posts
         // posts() -> Load a query builder for posts
-        $posts = $tag->posts()->paginate(config('blog.posts_per_page'));
+        $posts = $tag->posts()->publishAt()->paginate(config('blog.posts_per_page'));
 
-        return view('tags.index', compact('posts'));
+        return view('tags.index', compact('posts', 'tag'));
     }
 }

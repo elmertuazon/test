@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
 {
-    use CrudTrait, HasFactory;
+    use CrudTrait, HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
 
@@ -37,5 +37,10 @@ class Post extends Model
         return $this->tags->map(function ($tag) {
             return '<a href="' . route('tag.show', $tag) . '">#' . $tag->name . '</a>';
         })->implode(', ');
+    }
+
+    public function scopePublishAt($query)
+    {
+        return $query->whereDate('publish_at', '<=', date('Y-m-d'));
     }
 }

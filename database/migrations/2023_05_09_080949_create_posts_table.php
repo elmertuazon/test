@@ -20,6 +20,7 @@ class CreatePostsTable extends Migration
             $table->longText('body');
             $table->string('author');
             $table->integer('category_id')->nullable()->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
