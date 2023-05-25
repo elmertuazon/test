@@ -2,50 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PostRequest;
+use App\Http\Requests\CreatePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Mail\PostCreated;
 use App\Models\Admin;
 use App\Models\Post;
 use App\Models\Category;
 use App\Models\Tag;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class PostsController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $posts = Post::with('category', 'tags')->published()->accepted()->latest()->paginate(config('blog.posts_per_page'));
         return view('posts.index', compact('posts'));
     }
 
-    public function show(Post $post)
+    public function show(Post $post): View
     {
         $this->authorize('view', $post);
 
         return view('posts.show', compact('post'));
     }
 
-    public function create()
+    public function create(): View
     {
         $users = User::all();
         $categories = Category::all();
         $tags = Tag::all();
 
-        return view('posts.store', compact('users', 'categories', 'tags'));
+        return view('posts.create', compact('users', 'categories', 'tags'))->with('post', new Post());
     }
 
-    public function store(PostRequest $request)
+    public function store(CreatePostRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
+        $post = Post::create($request->validated());
 
-        if (isset($validated['image'])) {
-            $path = $request->file('image')->store('images');
-            $validated['image'] = substr($path, 7);
-        }
-        $post = Post::create($validated);
+        $post->tags()->sync($request->tags);
 
         Session::flash('success', 'Post Created!');
 
@@ -54,7 +52,7 @@ class PostsController extends Controller
         return redirect()->route('posts.show', $post);
     }
 
-    public function edit(Post $post)
+    public function edit(Post $post): View
     {
         $this->authorize('update', $post);
 
@@ -65,16 +63,14 @@ class PostsController extends Controller
         return view('posts.edit', compact('post', 'users', 'categories', 'tags'));
     }
 
-    public function update(PostRequest $request, Post $post)
+    public function update(UpdatePostRequest $request, Post $post): RedirectResponse
     {
         $this->authorize('update', $post);
 
-        $validated = $request->validated();
-        if (isset($validated['image'])) {
-            $path = $request->file('image')->store('images');
-            $validated['image'] = substr($path, 7);
-        }
-        $post->update($validated);
+        $post->update($request->validated());
+
+        $post->tags()->sync($request->tags);
+
         Session::flash('success', 'Post Updated!');
 
         return redirect()->route('posts.show', $post);

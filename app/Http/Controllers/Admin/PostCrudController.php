@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\PostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Mail\PostStatusUpdated;
 use App\Models\Category;
 use App\Models\Post;
@@ -101,7 +101,7 @@ class PostCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(PostRequest::class);
+        CRUD::setValidation(UpdatePostRequest::class);
 
         $this->crud->addField([
             'name' => 'title'

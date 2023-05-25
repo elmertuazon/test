@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class PostRequest extends FormRequest
+class CreatePostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,7 +31,7 @@ class PostRequest extends FormRequest
              'body' => ['required', 'min:5'],
              'author_id' => ['required', 'exists:users,id'],
              'category_id' => ['required', 'exists:categories,id'],
-             'image' => ['dimensions:min_width=100,max_width=1000,min_height=100,max_height=1000', 'image', 'mimes:jpeg,png,jpg,gif,svg']
+             'image' => ['required', 'image', 'bail', 'mimes:jpeg,png,jpg,gif,svg,webp', 'dimensions:min_width=100,max_width=1000,min_height=100,max_height=1000']
         ];
     }
 

@@ -8,12 +8,13 @@
         <h6>By {{$post->author->name}}</h6>
     </div>
     <div class="card-body">
-        @if ($post->image)
-            {{--<img width="200" height="200" src="{{ Storage::disk('images')->get($post->image) }}" />--}}
-            <img width="200" height="200" src="/images/{{ $post->image }}"/>
-        @else
-            <div class="fakeimg" style="height:200px;"></div>
-        @endif
+        <div class="d-flex justify-content-center">
+            @if ($post->image)
+                <img style="max-height: 200px" src="/{{ $post->image }}"/>
+            @else
+                <div class="fakeimg" style="height:200px;"></div>
+            @endif
+        </div>
 
         <h4 class="mt-4"><em>Introduction {{$post->introduction}}</em></h4>
 

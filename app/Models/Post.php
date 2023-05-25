@@ -11,6 +11,7 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 
 class Post extends Model
@@ -67,5 +68,10 @@ class Post extends Model
     public function scopeAccepted($query)
     {
         return $query->where('status', 'accepted');
+    }
+
+    public function setImageAttribute($image): void
+    {
+        $this->attributes['image'] = $image->store('uploads');
     }
 }
