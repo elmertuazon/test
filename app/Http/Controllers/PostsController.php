@@ -18,15 +18,14 @@ class PostsController extends Controller
     public function index()
     {
         $posts = Post::with('category', 'tags')->published()->notDraft()->paginate(config('blog.posts_per_page'));
-        $hasToShowBody = false;
-        return view('posts.index', compact('posts', 'hasToShowBody'));
+        return view('posts.index', compact('posts'));
     }
 
     public function show(Post $post)
     {
         abort_if($post->publish_at > now(), 404);
         $hasToShowBody = true;
-        return view('posts.show', compact('post', 'hasToShowBody'));
+        return view('posts.show', compact('post'));
     }
 
     public function create()
@@ -39,10 +38,9 @@ class PostsController extends Controller
 
     public function store(PostRequest $request)
     {
-        
+
         $validated = $request->validated();
-        if(isset($validated['image']))
-        {
+        if (isset($validated['image'])) {
             $path = $request->file('image')->store('images');
             $validated['image'] = substr($path, 7);
         }
@@ -63,8 +61,7 @@ class PostsController extends Controller
     public function update(PostRequest $request, Post $post)
     {
         $validated = $request->validated();
-        if(isset($validated['image']))
-        {
+        if (isset($validated['image'])) {
             $path = $request->file('image')->store('images');
             $validated['image'] = substr($path, 7);
         }

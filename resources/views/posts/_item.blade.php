@@ -10,22 +10,27 @@
     <div class="card-body">
         @if ($post->image)
             {{--<img width="200" height="200" src="{{ Storage::disk('images')->get($post->image) }}" />--}}
-            <img width="200" height="200" src="/images/{{ $post->image }}" />
+            <img width="200" height="200" src="/images/{{ $post->image }}"/>
         @else
             <div class="fakeimg" style="height:200px;"></div>
         @endif
-        
+
         <h4 class="mt-4"><em>Introduction {{$post->introduction}}</em></h4>
 
-        <div class="mt-4">
-            <p>{!! $hasToShowBody ? nl2br($post->body) : nl2br(Str::limit($post->body, 50)) !!}</p>
-            
-        </div>
+        @if($showBody)
+            <div class="mt-4">
+                <p>{!! nl2br($post->body) !!}</p>
+            </div>
+        @endif
     </div>
     <div class="card-footer">
         <div class="d-flex justify-content-between align-items-center">
-            <h6>Categorised as <a href="{{ route('category.show', $post->category) }}"><strong>{{$post->category->name}}</strong></a></h6>
-            @if ($post->status == 'draft') <a href="{{ route('posts.edit', $post) }}">Edit</a> @endif
+            <h6>Categorised as <a
+                    href="{{ route('category.show', $post->category) }}"><strong>{{$post->category->name}}</strong></a>
+            </h6>
+            @if ($post->status == 'draft')
+                <a href="{{ route('posts.edit', $post) }}">Edit</a>
+            @endif
             <h6>Tags {!! $post->tagsAsLinks() !!}</h6>
         </div>
     </div>

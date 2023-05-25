@@ -8,7 +8,7 @@
     </div>
     <div class="row">
         <div class="col-12">
-            @include('posts._item')
+            @include('posts._item', ['showBody' => true])
         </div>
     </div>
 @endsection

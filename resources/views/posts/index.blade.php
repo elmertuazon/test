@@ -4,7 +4,7 @@
     <div class="row">
         @foreach ($posts as $post)
             <div class="col-12 mb-4">
-                @include('posts._item')
+                @include('posts._item', ['showBody' => false])
             </div>
         @endforeach
     </div>
