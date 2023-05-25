@@ -23,7 +23,8 @@ class PostFactory extends Factory
             'body' => $this->faker->paragraphs(10, true),
             'author_id' => User::factory(),
             'category_id' => Category::factory(),
-            'publish_at' => now()->subDays(1)
+            'publish_at' => now()->subDays(1),
+            'status' => $this->faker->randomElement(['draft', 'accepted'])
         ];
     }
 }

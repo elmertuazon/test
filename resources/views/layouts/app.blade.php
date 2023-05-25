@@ -32,12 +32,22 @@
 <body>
     <div id="app">
         @include('layouts.navigation')
-
+        @if(Session::has('success'))
+            <div id="session_notification" class="alert alert-success" role= "alert">
+            <strong>Successful:</strong>
+                {{ Session::pull('success') }} 
+            </div>
+        @endif
         <main class="py-4">
             <div class="container">
                 @yield('content')
             </div>
         </main>
     </div>
+    <script>
+        setTimeout(() => {
+            document.getElementById('session_notification').style.display = 'none'
+        }, 3000);
+    </script>
 </body>
 </html>

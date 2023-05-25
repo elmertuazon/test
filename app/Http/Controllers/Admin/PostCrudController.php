@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\PostRequest;
+use App\Mail\PostStatusUpdated;
 use App\Models\Category;
+use App\Models\Post;
 use App\Models\PostTag;
 use App\Models\Tag;
 use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Class PostCrudController
@@ -18,8 +22,8 @@ use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 class PostCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as traitStore; }
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation { update as traitUpdate; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
@@ -79,6 +83,11 @@ class PostCrudController extends CrudController
             'entity'    => 'tags',
             'attribute' => 'name',
             'model'     => App\Models\Tag::class,
+        ]);
+
+        $this->crud->addColumn([
+            'name' => 'status',
+            'label' => 'Status'
         ]);
 
 
@@ -153,6 +162,17 @@ class PostCrudController extends CrudController
                 'class' => 'col-md-4'
             ]
         ]);
+
+        $this->crud->addField([
+            'name' => 'status',
+            'label' => 'Status',
+            'type'  => 'select_from_array',
+            'options' => [
+                'draft' => 'draft',
+                'accepted' => 'accepted',
+                'declined' => 'declined'
+            ]
+        ]);
         // CRUD::field('id');
         // CRUD::field('title');
         // CRUD::field('introduction');
@@ -178,5 +198,47 @@ class PostCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    public function store(Request $request)
+    {
+        
+      // do something before validation, before save, before everything
+      $response = $this->traitStore();
+      $post = Post::find($this->data['entry']['id']);
+      if($this->data['entry']['status'] == 'accepted')
+      {
+        $post->publish_at = now();
+        $post->save();
+        Mail::to(User::find($this->data['entry']['author_id'])->first()->email)->queue(new PostStatusUpdated($post, true));
+      }
+      // do something after save
+      return $response;
+    }
+
+    public function update(Request $request)
+    {
+        
+      $post = Post::find($request->id);
+      $response = $this->traitUpdate();
+      switch ($this->crud->entry['status']) {
+        case 'accepted':
+            if(!$post->publish_at)
+            {
+                Post::where('id', $this->data['entry']['id'])->update(['publish_at' => now()]);
+                Mail::to(User::find($this->data['entry']['author_id'])->first()->email)->queue(new PostStatusUpdated($post, true));
+            }
+            break;
+        case 'declined':
+            Mail::to(User::find($this->data['entry']['author_id'])->first()->email)->queue(new PostStatusUpdated($post, false));
+            break;
+        case 'draft':
+            Post::where('id', $this->data['entry']['id'])->update(['publish_at' => null]);
+            break;
+        default:
+        //   
+      }
+      // do something after save
+      return $response;
     }
 }

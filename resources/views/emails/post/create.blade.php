@@ -1,0 +1,1 @@
+<a href="{{ route('post.show', $post->id) }}">POST HERE</a>

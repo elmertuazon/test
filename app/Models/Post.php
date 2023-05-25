@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
 
 class Post extends Model
 {
@@ -39,8 +40,20 @@ class Post extends Model
         })->implode(', ');
     }
 
+    public static function countMonthlyPosts(int $month, int $year)
+    {
+        return self::whereYear('created_at', $year)
+        ->whereMonth('created_at', $month)
+        ->count();
+    }
+
     public function scopePublished($query)
     {
         return $query->where('publish_at', '<=', now());
+    }
+
+    public function scopeNotDraft($query)
+    {
+        return $query->where('status', '!=', 'draft');
     }
 }

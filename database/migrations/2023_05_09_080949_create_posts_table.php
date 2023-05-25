@@ -16,10 +16,11 @@ class CreatePostsTable extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('introduction'); // 255 characters
+            $table->longText('introduction'); // 255 characters
             $table->longText('body');
             $table->string('author');
             $table->integer('category_id')->nullable()->default(0);
+            $table->string('status')->default('draft');
             $table->softDeletes();
             $table->timestamps();
         });
