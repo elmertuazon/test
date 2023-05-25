@@ -173,6 +173,14 @@ class PostCrudController extends CrudController
                 'declined' => 'declined'
             ]
         ]);
+
+        $this->crud->addField([
+            'name' => 'publish_at',
+            'type' => 'datetime_picker',
+            'label' => 'Publish At',
+            'allows_null' => true,
+        ]);
+
         // CRUD::field('id');
         // CRUD::field('title');
         // CRUD::field('introduction');

@@ -17,13 +17,14 @@ class PostsController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('category', 'tags')->published()->notDraft()->paginate(config('blog.posts_per_page'));
+        $posts = Post::with('category', 'tags')->published()->accepted()->paginate(config('blog.posts_per_page'));
         return view('posts.index', compact('posts'));
     }
 
     public function show(Post $post)
     {
         abort_if($post->publish_at > now(), 404);
+        abort_if($post->status !== 'accepted', 404);
         $hasToShowBody = true;
         return view('posts.show', compact('post'));
     }

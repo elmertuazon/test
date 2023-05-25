@@ -64,8 +64,8 @@ class Post extends Model
         return $query->where('publish_at', '<=', now());
     }
 
-    public function scopeNotDraft($query)
+    public function scopeAccepted($query)
     {
-        return $query->where('status', '!=', 'draft');
+        return $query->where('status', 'accepted');
     }
 }
