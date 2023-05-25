@@ -46,7 +46,9 @@ class PostsController extends Controller
         }
         $post = Post::create($validated);
         Session::flash('success', 'Post Created!');
-        Mail::to(Admin::first()->email)->queue(new PostCreated($post));
+
+        Mail::to(Admin::first()->email)->send(new PostCreated($post));
+
         return redirect('/');
     }
 

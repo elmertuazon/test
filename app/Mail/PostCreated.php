@@ -8,11 +8,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class PostCreated extends Mailable
+class PostCreated extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $post;
+    public Post $post;
     /**
      * Create a new message instance.
      *
@@ -30,10 +30,6 @@ class PostCreated extends Mailable
      */
     public function build()
     {
-        return $this->from(config('mail.from.address'), config('mail.from.name'))
-                ->view('emails.post.create')
-                ->with([
-                    'post' => $this->post
-                ]);
+        return $this->view('emails.post.create')->subject('New Post Created');
     }
 }

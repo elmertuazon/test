@@ -199,46 +199,4 @@ class PostCrudController extends CrudController
     {
         $this->setupCreateOperation();
     }
-
-    public function store(Request $request)
-    {
-        
-      // do something before validation, before save, before everything
-      $response = $this->traitStore();
-      $post = Post::find($this->data['entry']['id']);
-      if($this->data['entry']['status'] == 'accepted')
-      {
-        $post->publish_at = now();
-        $post->save();
-        Mail::to(User::find($this->data['entry']['author_id'])->first()->email)->queue(new PostStatusUpdated($post, true));
-      }
-      // do something after save
-      return $response;
-    }
-
-    public function update(Request $request)
-    {
-        
-      $post = Post::find($request->id);
-      $response = $this->traitUpdate();
-      switch ($this->crud->entry['status']) {
-        case 'accepted':
-            if(!$post->publish_at)
-            {
-                Post::where('id', $this->data['entry']['id'])->update(['publish_at' => now()]);
-                Mail::to(User::find($this->data['entry']['author_id'])->first()->email)->queue(new PostStatusUpdated($post, true));
-            }
-            break;
-        case 'declined':
-            Mail::to(User::find($this->data['entry']['author_id'])->first()->email)->queue(new PostStatusUpdated($post, false));
-            break;
-        case 'draft':
-            Post::where('id', $this->data['entry']['id'])->update(['publish_at' => null]);
-            break;
-        default:
-        //   
-      }
-      // do something after save
-      return $response;
-    }
 }

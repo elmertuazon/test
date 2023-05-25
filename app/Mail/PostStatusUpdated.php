@@ -8,21 +8,19 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class PostStatusUpdated extends Mailable
+class PostStatusUpdated extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $post;
-    public $status;
+    public Post $post;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Post $post, bool $status)
+    public function __construct(Post $post)
     {
         $this->post = $post;
-        $this->status = $status;
     }
 
     /**
@@ -32,11 +30,6 @@ class PostStatusUpdated extends Mailable
      */
     public function build()
     {
-        return $this->from(config('mail.from.address'), config('mail.from.name'))
-                ->view('emails.post.update_status')
-                ->with([
-                    'post' => $this->post,
-                    'status' => $this->status
-                ]);
+        return $this->view('emails.post.update_status')->subject('Post Status Updated');
     }
 }
