@@ -28,9 +28,9 @@
             <h6>Categorised as <a
                     href="{{ route('category.show', $post->category) }}"><strong>{{$post->category->name}}</strong></a>
             </h6>
-            @if ($post->status == 'draft')
+            @can('update', $post)
                 <a href="{{ route('posts.edit', $post) }}">Edit</a>
-            @endif
+            @endcan
             <h6>Tags {!! $post->tagsAsLinks() !!}</h6>
         </div>
     </div>

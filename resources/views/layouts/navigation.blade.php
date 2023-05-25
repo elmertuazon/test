@@ -14,19 +14,16 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('posts.create') }}">Add a new post</a>
                 </li>
-            </ul>
-            <ul class="navbar-nav me-auto">
+                @auth()
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.posts') }}">My Post</a>
+                    </li>
+                @endauth
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('user.posts') }}">My Post</a>
+                    <a class="nav-link" href="#">Total {{ $monthlyPosts }}</a>
                 </li>
             </ul>
 
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <p>Total {{ $monthlyPosts }}</p>
-                </li>
-            </ul>
-            
             <!-- Right Side Of Navbar -->
             <ul class="navbar-nav ms-auto">
                 <!-- Authentication Links -->

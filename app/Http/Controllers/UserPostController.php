@@ -10,7 +10,7 @@ class UserPostController extends Controller
 {
     public function __invoke()
     {
-        $posts = Post::where('author_id', auth()->user()->id)->published()->paginate(config('blog.posts_per_page'));
+        $posts = Post::where('author_id', auth()->id())->latest()->paginate(config('blog.posts_per_page'));
         return view('posts.index', compact('posts'));
     }
 }
