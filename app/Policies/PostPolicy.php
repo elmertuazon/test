@@ -10,9 +10,10 @@ class PostPolicy
 {
     use HandlesAuthorization;
 
-    public function view(User $user, Post $post)
+    public function view(?User $user, Post $post): bool
     {
         $isThePostPublished = $post->publish_at <= now();
+
         $isThePostAccepted = $post->status === 'accepted';
 
         $isThePostInDraftOrDeclinedAndTheUserIsTheAuthor = in_array($post->status, ['draft', 'declined']) && $user->id === $post->author_id;
@@ -20,7 +21,7 @@ class PostPolicy
         return $isThePostPublished && ($isThePostAccepted || $isThePostInDraftOrDeclinedAndTheUserIsTheAuthor);
     }
 
-    public function update(User $user, Post $post)
+    public function update(User $user, Post $post): bool
     {
         return $post->status === 'draft' && $user->id === $post->author_id;
     }
