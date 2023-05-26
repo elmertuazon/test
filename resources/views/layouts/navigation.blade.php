@@ -19,9 +19,6 @@
                         <a class="nav-link" href="{{ route('user.posts') }}">My Post</a>
                     </li>
                 @endauth
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Total {{ $monthlyPosts }}</a>
-                </li>
             </ul>
 
             <!-- Right Side Of Navbar -->

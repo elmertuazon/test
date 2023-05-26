@@ -11,15 +11,27 @@ use App\Models\Category;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class PostsController extends Controller
 {
-    public function index(): View
+    public function index(Request $request)
     {
-        $posts = Post::with('category', 'tags')->published()->accepted()->latest()->paginate(config('blog.posts_per_page'));
+        $posts = Post::with('category', 'tags')
+            ->published()
+            ->accepted()
+            ->when($request->has('month'), function($posts) use($request){
+                [$searchYear, $searchMonth] = explode('-', $request->input('month'));
+
+                $posts->whereYear('publish_at', (int) $searchYear)->whereMonth('publish_at', (int) $searchMonth);
+            })
+            ->latest('publish_at')
+            ->paginate(config('blog.posts_per_page'))
+            ->appends($request->query());
+
         return view('posts.index', compact('posts'));
     }
 

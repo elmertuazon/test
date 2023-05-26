@@ -3,7 +3,10 @@
         <div class="d-flex justify-content-between align-items-center">
             <a href="{{route('posts.show', $post )}}"><h2>{{$post->title}}</h2></a>
             <h6 style="color:red">{{ucfirst($post->status)}}</h6>
-            <h6>{{$post->created_at->format('d/m/Y \a\t H:i')}}</h6>
+            @if($post->publish_at)
+                <h6>{{ $post->publish_at->format('d/m/Y \a\t H:i')}}</h6>
+            @endif
+
         </div>
         <h6>By {{$post->author->name}}</h6>
     </div>

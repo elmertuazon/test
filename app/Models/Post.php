@@ -21,6 +21,11 @@ class Post extends Model
     protected $guarded = ['id'];
 
 
+    protected $casts = [
+        'publish_at' => 'datetime',
+    ];
+
+
     public static function booted()
     {
         static::updated(function(Post $post) {
@@ -51,13 +56,6 @@ class Post extends Model
         return $this->tags->map(function ($tag) {
             return '<a href="' . route('tag.show', $tag) . '">#' . $tag->name . '</a>';
         })->implode(', ');
-    }
-
-    public static function countMonthlyPosts(int $month, int $year)
-    {
-        return self::whereYear('created_at', $year)
-        ->whereMonth('created_at', $month)
-        ->count();
     }
 
     public function scopePublished($query)

@@ -16,6 +16,10 @@ class PostPolicy
 
         $isThePostAccepted = $post->status === 'accepted';
 
+        if($user === null) {
+            return $isThePostPublished && $isThePostAccepted;
+        }
+
         $isThePostInDraftOrDeclinedAndTheUserIsTheAuthor = in_array($post->status, ['draft', 'declined']) && $user->id === $post->author_id;
 
         return $isThePostPublished && ($isThePostAccepted || $isThePostInDraftOrDeclinedAndTheUserIsTheAuthor);
