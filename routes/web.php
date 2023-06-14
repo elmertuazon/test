@@ -21,7 +21,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-posts', UserPostController::class)->name('user.posts');
     Route::post('posts/{post:slug}/comments', [CommentController::class, 'store']);
     Route::get('account', [UserController::class, 'edit'])->name('user.edit');
+
     Route::put('account', [UserController::class, 'update'])->name('user.update');
+    Route::put('account/password', [UserController::class, 'updatePassword'])->name('user.update-password');
 });
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -18,14 +19,18 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request): RedirectResponse
     {
-        $accountInfo = collect($request->validated())->only('name', 'email')->toArray();
+        $request->user()->update($request->validated());
 
-        if(!is_null($request->password))
-        {
-            $accountInfo['password'] = $request->password;
-        }
+        Session::flash('success', 'User Updated!');
 
-        $request->user()->update($accountInfo);
+        return back();
+    }
+
+    public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
+    {
+        auth()->user()->update([
+            'password' => $request->password
+        ]);
 
         Session::flash('success', 'User Updated!');
 
