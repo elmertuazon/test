@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class Post extends Model
@@ -105,6 +106,11 @@ class Post extends Model
     public function setImageAttribute($image): void
     {
         $this->attributes['image'] = $image->store('uploads');
+    }
+
+    public function setPasswordAttribute($password): void
+    {
+        $this->attributes['passowrd'] = Hash::make($password);
     }
 
     public function comments()

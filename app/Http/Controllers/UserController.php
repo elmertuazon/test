@@ -19,7 +19,7 @@ class UserController extends Controller
     {
         
         $this->authorize('update', $user);
-       
+        
         $user->update($request->validated());
 
         Session::flash('success', 'User Updated!');
