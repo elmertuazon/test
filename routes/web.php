@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\CategoryShowController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\TagShowController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPostController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +19,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/posts/{post}', [PostsController::class, 'update'])->name('posts.update');
 
     Route::get('/my-posts', UserPostController::class)->name('user.posts');
+    Route::post('posts/{post:slug}/comments', [CommentController::class, 'store']);
+    Route::get('account/{user:email}', [UserController::class, 'edit'])->name('user.edit');
+    Route::put('account/{user:email}', [UserController::class, 'update'])->name('user.update');
 });
 
 

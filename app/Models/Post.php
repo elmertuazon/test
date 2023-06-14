@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 
 class Post extends Model
@@ -45,6 +43,11 @@ class Post extends Model
         return $this->belongsToMany(Tag::class);
     }
 
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -58,6 +61,28 @@ class Post extends Model
         })->implode(', ');
     }
 
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? false, fn ($query, $search) => 
+            $query->where(fn($query) => 
+                $query->where('title', 'like', '%' . $search . '%')
+                ->orWhere('body', 'like', '%' . $search . '%')
+                )
+            );
+
+        $query->when($filters['popular'] ?? false, fn ($query) => 
+            $query->where(fn($query) => 
+                $query->orderBy('popularity')
+            )
+        );
+
+        $query->when($filters['favorite'] ?? false, fn ($query) => $query
+            ->whereHas('favorites', fn ($query) =>
+                $query->where('is_favorite', true)
+            )
+        );
+    }
+
     public function scopePublished($query)
     {
         return $query->where('publish_at', '<=', now());
@@ -68,8 +93,22 @@ class Post extends Model
         return $query->where('status', 'accepted');
     }
 
+    public function scopeMonthlyPublished($query, $request)
+    {
+        return $query->when($request->has('month'), function($posts) use($request){
+            [$searchYear, $searchMonth] = explode('-', $request->input('month'));
+
+            $posts->whereYear('publish_at', (int) $searchYear)->whereMonth('publish_at', (int) $searchMonth);
+        });
+    }
+
     public function setImageAttribute($image): void
     {
         $this->attributes['image'] = $image->store('uploads');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

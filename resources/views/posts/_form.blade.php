@@ -16,9 +16,23 @@
     </div>
     <div class="col-12 mb-2">
         <div class="form-group">
+            <label for="exampleFormControlInput1">Slug</label>
+
+            <input name="slug" type="text" class="form-control @error('slug') is-invalid @enderror"
+                   id="exampleFormControlInput1"
+                   value="{{ old('slug', $post->slug) }}">
+
+            @error('slug')
+            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+            @enderror
+        </div>
+    </div>
+    <div class="col-12 mb-2">
+        <div class="form-group">
             <label for="exampleFormControlInput1">Introduction</label>
-            <input name="introduction" type="text" class="form-control" id="exampleFormControlInput1"
-                   @error('introduction') is-invalid @enderror
+            <input name="introduction" type="text" class="form-control @error('introduction') is-invalid @enderror" id="exampleFormControlInput1"
                    value="{{ old('introduction', $post->introduction) }}">
             @error('introduction')
             <span class="invalid-feedback" role="alert">
@@ -30,8 +44,7 @@
     <div class="col-12 mb-2">
         <div class="form-group">
             <label for="exampleFormControlInput1">Body</label>
-            <textarea name="body" class="form-control" id="exampleFormControlTextarea1" @error('body') is-invalid
-                      @enderror
+            <textarea name="body" class="form-control @error('body') is-invalid @enderror" id="exampleFormControlTextarea1" 
                       rows="3">{{ old('body', $post->body) }}</textarea>
 
             @error('body')
@@ -44,8 +57,7 @@
     <div class="col-12 mb-2">
         <div class="form-group">
             <label for="exampleFormControlSelect1">Author</label>
-            <select name="author_id" class="form-control" id="exampleFormControlSelect1"
-                    @error('author_id') is-invalid @enderror>
+            <select name="author_id" class="form-control @error('author_id') is-invalid @enderror" id="exampleFormControlSelect1">
                 @foreach ($users as $user)
                     <option value="{{ $user->id }}"
                             @if(old('user_id', $post->user_id) === $user->id) selected @endif>{{ ucwords($user->name) }}</option>
@@ -63,8 +75,7 @@
         <div class="form-group">
             <label for="exampleFormControlSelect1">Category</label>
 
-            <select name="category_id" class="form-control" id="exampleFormControlSelect1"
-                    @error('category_id') is-invalid @enderror>
+            <select name="category_id" class="form-control @error('category_id') is-invalid @enderror" id="exampleFormControlSelect1">
                 @foreach ($categories as $category)
                     <option value="{{ $category->id }}"
                             @if(old('category_id', $post->category_id) === $category->id) selected @endif>{{ ucwords($category->name) }}</option>

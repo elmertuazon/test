@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class PostFactory extends Factory
 {
@@ -19,6 +20,7 @@ class PostFactory extends Factory
     {
         return [
             'title' => $this->faker->sentence(),
+            'slug' => Str::slug($this->faker->unique()->word()),
             'introduction' => $this->faker->sentences(2, true),
             'body' => $this->faker->paragraphs(10, true),
             'author_id' => User::factory(),

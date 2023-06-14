@@ -25,7 +25,7 @@ class PostSeeder extends Seeder
             'email' => 'e.tuazon@morrowsodali.com'
         ]);
 
-        foreach (range(1, 100) as $_) {
+        foreach (range(1, 50) as $_) {
             Post::factory()
                 ->for(Category::factory(), 'category')
                 ->for($author, 'author')

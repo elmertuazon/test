@@ -23,14 +23,15 @@ class PostsController extends Controller
         $posts = Post::with('category', 'tags')
             ->published()
             ->accepted()
-            ->when($request->has('month'), function($posts) use($request){
-                [$searchYear, $searchMonth] = explode('-', $request->input('month'));
-
-                $posts->whereYear('publish_at', (int) $searchYear)->whereMonth('publish_at', (int) $searchMonth);
-            })
+            ->filter(request([
+                'search', 
+                'popular', 
+                'favorite'
+            ]))
+            ->monthlyPublished($request)
             ->latest('publish_at')
             ->paginate(config('blog.posts_per_page'))
-            ->appends($request->query());
+            ->withQueryString();
 
         return view('posts.index', compact('posts'));
     }
@@ -38,7 +39,9 @@ class PostsController extends Controller
     public function show(Post $post): View
     {
         $this->authorize('view', $post);
-
+        $post->update([
+            'popularity' => $post->popularity + 1,
+        ]);
         return view('posts.show', compact('post'));
     }
 
@@ -86,5 +89,10 @@ class PostsController extends Controller
         Session::flash('success', 'Post Updated!');
 
         return redirect()->route('posts.show', $post);
+    }
+
+    public function isFavorite(Request $request, Post $post)
+    {
+        $post->favorite()->sync($request->isFavorite);
     }
 }

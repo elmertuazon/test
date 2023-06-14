@@ -27,6 +27,7 @@ class CreatePostRequest extends FormRequest
     {
         return [
              'title' => ['required', 'min:5', 'max:255'],
+             'slug' => ['required', Rule::unique('posts', 'slug')],
              'introduction' => ['required', 'min:5', 'max:255'],
              'body' => ['required', 'min:5'],
              'author_id' => ['required', 'exists:users,id'],
