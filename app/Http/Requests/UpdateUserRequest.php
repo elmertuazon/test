@@ -26,7 +26,7 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => ['required', 'min:5', 'max:255'],
             'email' => ['required', 'email', 'exists:users,email'],
-            'password' => ['required'],
+            'password' => ['nullable'],
         ];
     }
 }

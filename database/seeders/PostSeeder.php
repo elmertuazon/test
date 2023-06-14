@@ -20,6 +20,7 @@ class PostSeeder extends Seeder
     public function run()
     {
         $tags = Tag::all();
+
         $author = User::factory()->create([
             'name' => 'Elmer',
             'email' => 'e.tuazon@morrowsodali.com'

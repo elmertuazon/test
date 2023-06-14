@@ -44,7 +44,7 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ route('user.edit', Auth::user()) }}">
+                            <a class="dropdown-item" href="{{ route('user.edit') }}">
                                 Update Account
                             </a>
                             <a class="dropdown-item" href="{{ route('logout') }}"
