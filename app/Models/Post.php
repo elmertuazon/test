@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Mail\PostStatusUpdated;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,16 +20,16 @@ class Post extends Model
 
     protected $guarded = ['id'];
 
-
     protected $casts = [
         'publish_at' => 'datetime',
+        'favorited' => 'boolean',
     ];
 
 
     public static function booted()
     {
-        static::updated(function(Post $post) {
-            if($post->status !== 'draft' && array_key_exists('status', $post->getDirty())) {
+        static::updated(function (Post $post) {
+            if ($post->status !== 'draft' && array_key_exists('status', $post->getDirty())) {
                 Mail::to($post->author)->queue(new PostStatusUpdated($post));
             }
         });
@@ -36,7 +37,7 @@ class Post extends Model
 
     public function category(): BelongsTo
     {
-        return  $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function tags(): BelongsToMany
@@ -62,24 +63,36 @@ class Post extends Model
         })->implode(', ');
     }
 
+    public function scopeWithFavorited(Builder $query, int $userId): void
+    {
+        $query->withCount($this->favoritedQuery($userId));
+    }
+
+    public function loadFavorited(int $userId): void
+    {
+        $this->loadCount($this->favoritedQuery($userId));
+    }
+
+    protected function favoritedQuery(int $userId): array
+    {
+        return ['favorites as favorited' => function ($query) use ($userId){
+            $query->where('user_id', $userId);
+        }];
+    }
+
     public function scopeFilter($query, array $filters)
     {
-        $query->when($filters['search'] ?? false, fn ($query, $search) =>
-            $query->where(fn($query) =>
-                $query->where('title', 'like', '%' . $search . '%')
-                ->orWhere('body', 'like', '%' . $search . '%')
-                )
-            );
-
-        $query->when($filters['popular'] ?? false, fn ($query) =>
-            $query->where(fn($query) =>
-                $query->orderBy('popularity')
-            )
+        $query->when($filters['search'] ?? false, fn($query, $search) => $query->where(fn($query) => $query->where('title', 'like', '%' . $search . '%')
+            ->orWhere('body', 'like', '%' . $search . '%')
+        )
         );
 
-        $query->when($filters['favorite'] ?? false, fn ($query) => $query
-            ->whereHas('favorites', fn ($query) =>
-                $query->where('is_favorite', true)
+        $query->when($filters['popular'] ?? false, fn($query) => $query->where(fn($query) => $query->orderBy('popularity')
+        )
+        );
+
+        $query->when($filters['favorite'] ?? false, fn($query) => $query
+            ->whereHas('favorites', fn($query) => $query->where('is_favorite', true)
             )
         );
     }
@@ -96,10 +109,10 @@ class Post extends Model
 
     public function scopeMonthlyPublished($query, $request)
     {
-        return $query->when($request->has('month'), function($posts) use($request){
+        return $query->when($request->has('month'), function ($posts) use ($request) {
             [$searchYear, $searchMonth] = explode('-', $request->input('month'));
 
-            $posts->whereYear('publish_at', (int) $searchYear)->whereMonth('publish_at', (int) $searchMonth);
+            $posts->whereYear('publish_at', (int)$searchYear)->whereMonth('publish_at', (int)$searchMonth);
         });
     }
 

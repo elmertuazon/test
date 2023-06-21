@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\CategoryShowController;
-use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CreateCommentController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\TagShowController;
 use App\Http\Controllers\UserController;
@@ -20,9 +21,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/my-posts', UserPostController::class)->name('user.posts');
 
-    Route::post('posts/{post}/comments', [CommentController::class, 'store'])->name('user.posts.comments');
+    Route::post('posts/{post}/comments', CreateCommentController::class)->name('user.posts.comments');
+    Route::post('is-favorite/{post}', FavoriteController::class)->name('user.posts.favorite');
 
-    Route::post('is-favorite/{post}', [PostsController::class, 'isFavorite'])->name('favorite');
 
     Route::get('account', [UserController::class, 'edit'])->name('user.edit');
 

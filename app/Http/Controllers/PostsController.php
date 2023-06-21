@@ -21,7 +21,8 @@ class PostsController extends Controller
 {
     public function index(Request $request)
     {
-        $posts = Post::with('category', 'tags', 'favorites', 'author')
+        $posts = Post::with('category', 'tags', 'author')
+            ->withFavorited(auth()->id())
             ->published()
             ->accepted()
             ->filter(request([
@@ -41,7 +42,9 @@ class PostsController extends Controller
     {
         $this->authorize('view', $post);
 
-        $post->load('category', 'tags', 'favorites', 'author', 'comments.author');
+        $post->load('category', 'tags', 'author', 'comments.author');
+
+        $post->loadFavorited(auth()->id());
 
         $post->update([
             'popularity' => $post->popularity + 1,
@@ -93,27 +96,5 @@ class PostsController extends Controller
         Session::flash('success', 'Post Updated!');
 
         return redirect()->route('posts.show', $post);
-    }
-
-    public function isFavorite(Request $request, Post $post): RedirectResponse
-    {
-        $favorite_result = 0;
-        switch ($request->is_favorite) {
-            case 0:
-                $favorite_result = 1;
-                break;
-
-            case 1:
-                $favorite_result = 0;
-                break;
-        }
-        Favorite::updateOrCreate([
-            'post_id' => $post->id,
-            'user_id' => auth()->user()->id
-        ],[
-            'is_favorite' =>  $favorite_result
-        ]);
-
-        return back();
     }
 }
