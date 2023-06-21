@@ -30,7 +30,6 @@ class CreatePostRequest extends FormRequest
              'slug' => ['required', Rule::unique('posts', 'slug')],
              'introduction' => ['required', 'min:5', 'max:255'],
              'body' => ['required', 'min:5'],
-             'author_id' => ['required', 'exists:users,id'],
              'category_id' => ['required', 'exists:categories,id'],
              'image' => ['required', 'image', 'bail', 'mimes:jpeg,png,jpg,gif,svg,webp', 'dimensions:min_width=100,max_width=1000,min_height=100,max_height=1000']
         ];

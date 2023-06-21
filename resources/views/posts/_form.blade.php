@@ -44,27 +44,10 @@
     <div class="col-12 mb-2">
         <div class="form-group">
             <label for="exampleFormControlInput1">Body</label>
-            <textarea name="body" class="form-control @error('body') is-invalid @enderror" id="exampleFormControlTextarea1" 
+            <textarea name="body" class="form-control @error('body') is-invalid @enderror" id="exampleFormControlTextarea1"
                       rows="3">{{ old('body', $post->body) }}</textarea>
 
             @error('body')
-            <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-            @enderror
-        </div>
-    </div>
-    <div class="col-12 mb-2">
-        <div class="form-group">
-            <label for="exampleFormControlSelect1">Author</label>
-            <select name="author_id" class="form-control @error('author_id') is-invalid @enderror" id="exampleFormControlSelect1">
-                @foreach ($users as $user)
-                    <option value="{{ $user->id }}"
-                            @if(old('user_id', $post->user_id) === $user->id) selected @endif>{{ ucwords($user->name) }}</option>
-                @endforeach
-            </select>
-
-            @error('author_id')
             <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>

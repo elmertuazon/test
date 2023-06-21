@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreatePostRequest;
@@ -8,7 +7,6 @@ use App\Mail\PostCreated;
 use App\Models\Admin;
 use App\Models\Post;
 use App\Models\Category;
-use App\Models\Favorite;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -19,6 +17,12 @@ use Illuminate\View\View;
 
 class PostsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:view,post')->only('show');
+        $this->middleware('can:update,post')->only(['edit', 'update']);
+    }
+
     public function index(Request $request)
     {
         $posts = Post::with('category', 'tags', 'author')
@@ -30,7 +34,8 @@ class PostsController extends Controller
                 'popular',
                 'favorite'
             ]))
-            ->monthlyPublished($request)
+            // 2021-01 $searchYear = 2021, $searchMonth = 01
+            ->when($request->has('month'), fn($query) => $query->monthlyPublished(...explode('-', $request->input('month'))))
             ->latest('publish_at')
             ->paginate(config('blog.posts_per_page'))
             ->withQueryString();
@@ -40,30 +45,29 @@ class PostsController extends Controller
 
     public function show(Post $post): View
     {
-        $this->authorize('view', $post);
-
         $post->load('category', 'tags', 'author', 'comments.author');
 
         $post->loadFavorited(auth()->id());
 
-        $post->update([
-            'popularity' => $post->popularity + 1,
-        ]);
+        $post->increment('popularity');
+
         return view('posts.show', compact('post'));
     }
 
     public function create(): View
     {
-        $users = User::all();
-        $categories = Category::all();
-        $tags = Tag::all();
-
-        return view('posts.create', compact('users', 'categories', 'tags'))->with('post', new Post());
+        return view('posts.create')
+            ->with([
+                'users' => User::all(),
+                'categories' => Category::all(),
+                'tags' => Tag::all(),
+                'post' => new Post
+            ]);
     }
 
     public function store(CreatePostRequest $request): RedirectResponse
     {
-        $post = Post::create($request->validated());
+        $post = $request->user()->posts()->create($request->validated());
 
         $post->tags()->sync($request->tags);
 
@@ -76,19 +80,17 @@ class PostsController extends Controller
 
     public function edit(Post $post): View
     {
-        $this->authorize('update', $post);
-
-        $users = User::all();
-        $categories = Category::all();
-        $tags = Tag::all();
-
-        return view('posts.edit', compact('post', 'users', 'categories', 'tags'));
+        return view('posts.edit')
+            ->with([
+                'users' => User::all(),
+                'categories' => Category::all(),
+                'tags' => Tag::all(),
+                'post' => $post
+            ]);
     }
 
     public function update(UpdatePostRequest $request, Post $post): RedirectResponse
     {
-        $this->authorize('update', $post);
-
         $post->update($request->validated());
 
         $post->tags()->sync($request->tags);

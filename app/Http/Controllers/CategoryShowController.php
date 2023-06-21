@@ -9,7 +9,7 @@ class CategoryShowController extends Controller
     public function __invoke(Category $category)
     {
         $posts = $category->posts()->published()->paginate(config('blog.posts_per_page'));
-        $hasToShowBody = false;
-        return view('category.index', compact('posts', 'category', 'hasToShowBody'));
+
+        return view('category.index', compact('posts', 'category'));
     }
 }

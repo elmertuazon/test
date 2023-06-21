@@ -107,13 +107,9 @@ class Post extends Model
         return $query->where('status', 'accepted');
     }
 
-    public function scopeMonthlyPublished($query, $request)
+    public function scopeMonthlyPublished(Builder $query, string $searchYear, string $searchMonth): void
     {
-        return $query->when($request->has('month'), function ($posts) use ($request) {
-            [$searchYear, $searchMonth] = explode('-', $request->input('month'));
-
-            $posts->whereYear('publish_at', (int)$searchYear)->whereMonth('publish_at', (int)$searchMonth);
-        });
+        $query->whereYear('publish_at', $searchYear)->whereMonth('publish_at', $searchMonth);
     }
 
     public function setImageAttribute($image): void
