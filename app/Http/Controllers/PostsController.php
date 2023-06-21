@@ -21,12 +21,12 @@ class PostsController extends Controller
 {
     public function index(Request $request)
     {
-        $posts = Post::with('category', 'tags')
+        $posts = Post::with('category', 'tags', 'favorites', 'author')
             ->published()
             ->accepted()
             ->filter(request([
-                'search', 
-                'popular', 
+                'search',
+                'popular',
                 'favorite'
             ]))
             ->monthlyPublished($request)
@@ -40,6 +40,9 @@ class PostsController extends Controller
     public function show(Post $post): View
     {
         $this->authorize('view', $post);
+
+        $post->load('category', 'tags', 'favorites', 'author');
+
         $post->update([
             'popularity' => $post->popularity + 1,
         ]);
@@ -99,7 +102,7 @@ class PostsController extends Controller
             case 0:
                 $favorite_result = 1;
                 break;
-            
+
             case 1:
                 $favorite_result = 0;
                 break;
