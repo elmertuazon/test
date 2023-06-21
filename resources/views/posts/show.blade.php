@@ -15,6 +15,7 @@
                     <div class="card">
                         <div class="card-body">
                             @auth
+
                                 <form method="POST" action="/posts/{{$post->slug}}/comments">
                                     @csrf
 

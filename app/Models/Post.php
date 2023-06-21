@@ -108,11 +108,6 @@ class Post extends Model
         $this->attributes['image'] = $image->store('uploads');
     }
 
-    public function setPasswordAttribute($password): void
-    {
-        $this->attributes['passowrd'] = Hash::make($password);
-    }
-
     public function comments()
     {
         return $this->hasMany(Comment::class);

@@ -35,6 +35,13 @@
             @can('update', $post)
                 <a href="{{ route('posts.edit', $post) }}">Edit</a>
             @endcan
+            @auth
+            <h6>
+            <div>
+                @include('posts._favorite')
+            </div>
+            </h6>
+            @endauth
             <h6>Tags {!! $post->tagsAsLinks() !!}</h6>
         </div>
     </div>

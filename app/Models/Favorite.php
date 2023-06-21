@@ -12,6 +12,10 @@ class Favorite extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'is_favorite' => 'boolean',
+    ];
+
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);

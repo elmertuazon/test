@@ -24,6 +24,7 @@ Route::middleware('auth')->group(function () {
 
     Route::put('account', [UserController::class, 'update'])->name('user.update');
     Route::put('account/password', [UserController::class, 'updatePassword'])->name('user.update-password');
+    Route::post('is-favorite/{post:slug}', [PostsController::class, 'isFavorite'])->name('favorite');
 });
 
 

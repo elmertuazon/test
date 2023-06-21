@@ -8,6 +8,7 @@ use App\Mail\PostCreated;
 use App\Models\Admin;
 use App\Models\Post;
 use App\Models\Category;
+use App\Models\Favorite;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -91,8 +92,25 @@ class PostsController extends Controller
         return redirect()->route('posts.show', $post);
     }
 
-    public function isFavorite(Request $request, Post $post)
+    public function isFavorite(Request $request, Post $post): RedirectResponse
     {
-        $post->favorite()->sync($request->isFavorite);
+        $favorite_result = 0;
+        switch ($request->is_favorite) {
+            case 0:
+                $favorite_result = 1;
+                break;
+            
+            case 1:
+                $favorite_result = 0;
+                break;
+        }
+        Favorite::updateOrCreate([
+            'post_id' => $post->id,
+            'user_id' => auth()->user()->id
+        ],[
+            'is_favorite' =>  $favorite_result
+        ]);
+
+        return back();
     }
 }
