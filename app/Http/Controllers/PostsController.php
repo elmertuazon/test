@@ -41,7 +41,7 @@ class PostsController extends Controller
     {
         $this->authorize('view', $post);
 
-        $post->load('category', 'tags', 'favorites', 'author');
+        $post->load('category', 'tags', 'favorites', 'author', 'comments.author');
 
         $post->update([
             'popularity' => $post->popularity + 1,

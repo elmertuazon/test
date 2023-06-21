@@ -19,12 +19,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/posts/{post}', [PostsController::class, 'update'])->name('posts.update');
 
     Route::get('/my-posts', UserPostController::class)->name('user.posts');
-    Route::post('posts/{post:slug}/comments', [CommentController::class, 'store']);
+
+    Route::post('posts/{post}/comments', [CommentController::class, 'store'])->name('user.posts.comments');
+
+    Route::post('is-favorite/{post}', [PostsController::class, 'isFavorite'])->name('favorite');
+
     Route::get('account', [UserController::class, 'edit'])->name('user.edit');
 
     Route::put('account', [UserController::class, 'update'])->name('user.update');
     Route::put('account/password', [UserController::class, 'updatePassword'])->name('user.update-password');
-    Route::post('is-favorite/{post:slug}', [PostsController::class, 'isFavorite'])->name('favorite');
 });
 
 

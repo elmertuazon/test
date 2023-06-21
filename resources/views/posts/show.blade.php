@@ -15,18 +15,17 @@
                     <div class="card">
                         <div class="card-body">
                             @auth
-
-                                <form method="POST" action="/posts/{{$post->slug}}/comments">
+                                <form method="POST" action="{{ route('user.posts.comments', $post) }}">
                                     @csrf
-
-                                    <header class="flex">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
                                         <img src="https://i.pravatar.cc/60?={{auth()->id()}}" alt="" width="40"
                                              height="40" class="rounded-full">
-                                        <h2 clss="ml-4">Want to participate</h2>
-                                    </header>
+                                        <h2 class="ml-4">Want to participate</h2>
+                                    </div>
 
                                     <div class="mt-6">
-                                        <textarea name="body" class="form-control rounded-0" rows="5" placeholder="Hey"
+                                        <textarea name="body" class="form-control rounded-0" rows="5"
+                                                  placeholder="Say hello..."
                                                   required></textarea>
                                     </div>
 
