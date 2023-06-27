@@ -26,7 +26,7 @@ class PostsController extends Controller
     public function index(Request $request)
     {
         $posts = Post::with('category', 'tags', 'author')
-            ->withFavorited(auth()->id())
+            ->when(auth()->check(), fn($query) => $query->withFavorited(auth()->id()))
             ->published()
             ->accepted()
             ->filter(request([
@@ -47,8 +47,9 @@ class PostsController extends Controller
     {
         $post->load('category', 'tags', 'author', 'comments.author');
 
-        $post->loadFavorited(auth()->id());
-
+        if(auth()->check()) {
+            $post->loadFavorited(auth()->id());
+        }
         $post->increment('popularity');
 
         return view('posts.show', compact('post'));

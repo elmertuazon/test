@@ -86,13 +86,11 @@ class Post extends Model
             ->orWhere('body', 'like', '%' . $search . '%')
         )
         );
-
-        $query->when($filters['popular'] ?? false, fn($query) => $query->where(fn($query) => $query->orderBy('popularity')
-        )
+        $query->when($filters['popular'] ?? false, fn($query) => $query->orderBy('popularity', 'desc')
         );
 
         $query->when($filters['favorite'] ?? false, fn($query) => $query
-            ->whereHas('favorites', fn($query) => $query->where('is_favorite', true)
+            ->whereHas('favorites', fn($query) => $query->where('user_id', auth()->id())
             )
         );
     }

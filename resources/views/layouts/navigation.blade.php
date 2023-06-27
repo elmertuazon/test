@@ -14,11 +14,29 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('posts.create') }}">Add a new post</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('home', ['popular'=>1]) }}">Popular Posts</a>
+                </li>
                 @auth()
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('user.posts') }}">My Post</a>
                     </li>
                 @endauth
+                <li>
+                    <form method="GET" action="{{ route('home', ['search' => request()->input('search')]) }}">
+                    <div class="row">
+                        <div class="col-6">
+                        <input name="search" type="text" class="form-control"
+                        value="">
+                        </div>
+                        <div class="col-6">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
+                    </div>
+                    </form>
+                    
+                    
+                </li>
             </ul>
 
             <!-- Right Side Of Navbar -->
@@ -44,6 +62,9 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('home', ['favorite' => 1]) }}">
+                                Favorite Posts
+                            </a>
                             <a class="dropdown-item" href="{{ route('user.edit') }}">
                                 Update Account
                             </a>
