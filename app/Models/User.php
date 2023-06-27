@@ -60,4 +60,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Post::class, 'author_id');
     }
+
+    public function links(): HasMany
+    {
+        return $this->hasMany(Link::class, 'author_id');
+    }
 }

@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCommentRequest;
+use App\Models\Comment;
+use App\Models\Link;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
-class CreateCommentController extends Controller
+class CreateCommentReplyController extends Controller
 {
-    public function __invoke(Post $post, StoreCommentRequest $request)
+    public function __invoke(Comment $comment, StoreCommentRequest $request)
     {
-        $post->comments()->create([
+        $comment->comments()->create([
             'user_id' => request()->user()->id,
             'body' => $request->validated()['body']
         ]);

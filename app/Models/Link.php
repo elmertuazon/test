@@ -4,18 +4,18 @@ namespace App\Models;
 
 use App\Mail\PostStatusUpdated;
 use App\Models\Traits\CanBeFavorited;
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Mail;
 
-class Post extends Model
+class Link extends Model
 {
     use CrudTrait, HasFactory, SoftDeletes;
     use CanBeFavorited;
@@ -26,16 +26,6 @@ class Post extends Model
         'publish_at' => 'datetime',
         'favorited' => 'boolean',
     ];
-
-
-    public static function booted()
-    {
-        static::updated(function (Post $post) {
-            if ($post->status !== 'draft' && array_key_exists('status', $post->getDirty())) {
-                Mail::to($post->author)->queue(new PostStatusUpdated($post));
-            }
-        });
-    }
 
     public function category(): BelongsTo
     {
@@ -94,11 +84,6 @@ class Post extends Model
     {
         $this->attributes['image'] = $image->store('uploads');
     }
-
-//    public function comments(): HasMany
-//    {
-//        return $this->hasMany(Comment::class, 'post_id', 'id');
-//    }
 
     public function comments(): MorphMany
     {

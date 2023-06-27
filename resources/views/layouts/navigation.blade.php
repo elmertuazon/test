@@ -14,6 +14,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('posts.create') }}">Add a new post</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('links.create') }}">Add a new link</a>
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('home', ['popular'=>1]) }}">Popular Posts</a>
                 </li>
@@ -34,8 +39,8 @@
                         </div>
                     </div>
                     </form>
-                    
-                    
+
+
                 </li>
             </ul>
 
