@@ -95,11 +95,6 @@ class Post extends Model
         $this->attributes['image'] = $image->store('uploads');
     }
 
-//    public function comments(): HasMany
-//    {
-//        return $this->hasMany(Comment::class, 'post_id', 'id');
-//    }
-
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');

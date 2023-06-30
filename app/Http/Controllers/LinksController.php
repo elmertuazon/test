@@ -17,7 +17,7 @@ class LinksController extends Controller
 {
     public function index(Request $request)
     {
-        
+
         $links = Link::with('category', 'tags', 'author')
             ->when(auth()->check(), fn($query) => $query->withFavorited(auth()->id()))
             ->published()
@@ -40,9 +40,10 @@ class LinksController extends Controller
     {
         $link->load('category', 'tags', 'author', 'comments.author', 'comments.comments.author');
 
-//        if(auth()->check()) {
-//            $link->loadFavorited(auth()->id());
-//        }
+        if(auth()->check()) {
+            $link->loadFavorited(auth()->id());
+        }
+
         $link->increment('popularity');
 
         return view('links.show', compact('link'));
