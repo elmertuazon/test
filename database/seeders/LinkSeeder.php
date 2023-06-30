@@ -3,14 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Link;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
-use Database\Factories\CategoryFactory;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
-class PostSeeder extends Seeder
+class LinkSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -21,23 +20,20 @@ class PostSeeder extends Seeder
     {
         $tags = Tag::all();
 
-        $author = User::factory()->create([
-            'name' => 'Elmer',
-            'email' => 'e.tuazon@morrowsodali.com'
-        ]);
+        $author = User::first();
 
         foreach (range(1, 50) as $_) {
-            Post::factory()
+            Link::factory()
                 ->for(Category::factory(), 'category')
                 ->for($author, 'author')
                 ->create();
         }
 
-        $posts = Post::all();
+        $links = Link::all();
 
-        foreach ($posts as $post)
+        foreach ($links as $link)
         {
-            $post->tags()
+            $link->tags()
                 ->attach($tags->random(rand(1, 3))->pluck('id')->toArray());
         }
     }
