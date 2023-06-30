@@ -10,8 +10,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Favorite extends Model
 {
-    use HasFactory;
-
     protected $guarded = ['id'];
 
     public function post(): BelongsTo
@@ -27,10 +25,5 @@ class Favorite extends Model
     public function favoritable(): MorphTo
     {
         return $this->morphTo();
-    }
-
-    public function favorites(): MorphMany
-    {
-        return $this->morphMany(Favorite::class, 'favoritable');
     }
 }
