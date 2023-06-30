@@ -29,6 +29,10 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('user.posts') }}">My Post</a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.links') }}">My Links</a>
+                    </li>
                 @endauth
                 <li>
                     <form method="GET" action="{{ route('home', ['search' => request()->input('search')]) }}">

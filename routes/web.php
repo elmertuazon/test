@@ -10,6 +10,7 @@ use App\Http\Controllers\LinksController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\TagShowController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserLinksController;
 use App\Http\Controllers\UserPostController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -38,7 +39,9 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('links', LinksController::class)->except(['destroy']);
     Route::post('links/{link}/comments', CreateLinkCommentController::class)->name('user.links.comments');
-    Route::post('links/{link}/favorites', CreateLinkFavoriteController::class)->name('user.links.favorites');
+    Route::post('links/{link}/favorite', CreateLinkFavoriteController::class)->name('user.links.favorite');
+    Route::get('/my-links', UserLinksController::class)->name('user.links');
+
     Route::post('comments/{comment}/comments', CreateCommentReplyController::class)->name('user.comments.comments');
 
 
