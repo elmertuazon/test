@@ -4,13 +4,12 @@ namespace App\Models;
 
 use App\Mail\PostStatusUpdated;
 use App\Models\Traits\CanBeFavorited;
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Mail;
@@ -42,11 +41,6 @@ class Post extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(Tag::class);
-    }
-
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -56,15 +50,16 @@ class Post extends Model
     public function tagsAsLinks()
     {
         return $this->tags->map(function ($tag) {
-            return '<a href="' . route('tag.show', $tag) . '">#' . $tag->name . '</a>';
+            return '<a href="'.route('tag.show', $tag).'">#'.$tag->name.'</a>';
         })->implode(', ');
     }
 
     public function scopeFilter($query, array $filters)
     {
-        $query->when($filters['search'] ?? false, fn($query, $search) => $query->where(fn($query) => $query->where('title', 'like', '%' . $search . '%')
-            ->orWhere('body', 'like', '%' . $search . '%')
-        )
+        $query->when($filters['search'] ?? false,
+            fn($query, $search) => $query->where(fn($query) => $query->where('title', 'like', '%'.$search.'%')
+                ->orWhere('body', 'like', '%'.$search.'%')
+            )
         );
         $query->when($filters['popular'] ?? false, fn($query) => $query->orderBy('popularity', 'desc')
         );
@@ -103,5 +98,10 @@ class Post extends Model
     public function favorites(): MorphMany
     {
         return $this->morphMany(Favorite::class, 'favoritable');
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
     }
 }

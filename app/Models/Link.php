@@ -32,11 +32,6 @@ class Link extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(Tag::class);
-    }
-
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -93,5 +88,10 @@ class Link extends Model
     public function favorites(): MorphMany
     {
         return $this->morphMany(Favorite::class, 'favoritable');
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
     }
 }

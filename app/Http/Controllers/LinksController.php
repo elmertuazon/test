@@ -64,7 +64,7 @@ class LinksController extends Controller
     {
         $link = $request->user()->links()->create($request->validated());
 
-        //$link->tags()->sync($request->tags);
+        $link->tags()->sync($request->tags);
 
         Session::flash('success', 'Link Created!');
 
@@ -86,7 +86,7 @@ class LinksController extends Controller
     {
         $link->update($request->validated());
 
-        //$link->tags()->sync($request->tags);
+        $link->tags()->sync($request->tags);
 
         Session::flash('success', 'Link Updated!');
 
