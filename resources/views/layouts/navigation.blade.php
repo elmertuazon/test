@@ -12,6 +12,9 @@
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('links.index') }}">Links</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ route('posts.create') }}">Add a new post</a>
                 </li>
 
@@ -67,6 +70,9 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('links.index', ['favorite' => 1]) }}">
+                                Favorite Links
+                            </a>
                             <a class="dropdown-item" href="{{ route('home', ['favorite' => 1]) }}">
                                 Favorite Posts
                             </a>

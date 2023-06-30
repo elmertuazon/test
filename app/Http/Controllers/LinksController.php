@@ -17,6 +17,7 @@ class LinksController extends Controller
 {
     public function index(Request $request)
     {
+        
         $links = Link::with('category', 'tags', 'author')
             ->when(auth()->check(), fn($query) => $query->withFavorited(auth()->id()))
             ->published()

@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryShowController;
 use App\Http\Controllers\CreateCommentReplyController;
 use App\Http\Controllers\CreateLinkCommentController;
+use App\Http\Controllers\CreateLinkFavoriteController;
 use App\Http\Controllers\CreatePostCommentController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\LinksController;
@@ -37,7 +38,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('links', LinksController::class)->except(['destroy']);
     Route::post('links/{link}/comments', CreateLinkCommentController::class)->name('user.links.comments');
-
+    Route::post('links/{link}/favorites', CreateLinkFavoriteController::class)->name('user.links.favorites');
     Route::post('comments/{comment}/comments', CreateCommentReplyController::class)->name('user.comments.comments');
 
 
