@@ -109,4 +109,9 @@ class Post extends Model
     {
         return $this->morphMany(Favorite::class, 'favoritable');
     }
+
+    public function path()
+    {
+        return "/posts/{$this->id}";
+    }
 }
