@@ -9,6 +9,7 @@ use Tests\TestCase;
 
 class ManageCategoriesTest extends TestCase
 {
+    use RefreshDatabase;
     /** @test */
     public function unauthenticated_user_can_see_category()
     {

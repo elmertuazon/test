@@ -30,7 +30,7 @@ Route::get('/tags/{tag:slug}', TagShowController::class)->name('tag.show');
 
 Route::middleware('auth')->group(function () {
 
-    Route::resource('posts', PostsController::class)->except(['index', 'destroy']);
+    Route::resource('posts', PostsController::class)->except(['index', 'show', 'destroy']);
     Route::post('posts/{post}/comments', CreatePostCommentController::class)->name('user.posts.comments');
     Route::post('posts/{post}/favorite', FavoriteController::class)->name('user.posts.favorite');
 

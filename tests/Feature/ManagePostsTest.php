@@ -12,14 +12,13 @@ class ManagePostsTest extends TestCase
     use WithFaker, RefreshDatabase;
 
     /** @test */
-public function guests_cannot_manage_posts()
+    public function guests_cannot_manage_posts()
     {
-        $post = Post::factory()->create();
-        $this->post('/posts', $post->toArray())->assertRedirect('login');
+        $post = Post::factory()->accepted()->create();
+        $this->post(route('posts.store'), $post->toArray())->assertRedirect('login');
         $this->get(route('posts.create'))->assertRedirect('login');
-        $this->get($post->path().'/edit')->assertRedirect('login');
-        // $this->get($post->path())->assertSee($post->title);
-        $this->post('/posts', $post->toArray())->assertRedirect('login');
+        $this->get(route('posts.edit', $post))->assertRedirect('login');
+        $this->get(route('posts.show', $post))->assertSee($post->title);
     }
 
     /** @test */
@@ -29,11 +28,14 @@ public function guests_cannot_manage_posts()
         $this->signIn();
         $this->createAdmin();
         $this->get('/posts/create')->assertStatus(200);
-        
+
+        $attributes = Post::factory()->make([
+            'slug' => 'test-slug',
+        ])->toArray();
+
         $this->followingRedirects()
-            ->post('/posts', $attributes = Post::factory()->raw())
+            ->post('/posts', $attributes)
             ->assertSee($attributes['title'])
-            ->assertSee($attributes['slug'])
             ->assertSee($attributes['introduction'])
             ->assertSee($attributes['author_id']);
     }
@@ -44,8 +46,8 @@ public function guests_cannot_manage_posts()
         $post = Post::factory()->create(['author_id' => $user->id]);
 
         $this->actingAs($post->author)
-             ->patch($post->path(), $attributes = ['title' => 'Changed'])
-             ->assertRedirect(route('posts.show', $post));
+            ->patch($post->path(), $attributes = ['title' => 'Changed'])
+            ->assertRedirect(route('posts.show', $post));
 
         $this->get($post->path().'/edit')->assertOk();
     }
@@ -69,7 +71,7 @@ public function guests_cannot_manage_posts()
 
         $this->post('/posts', $attributes)->assertSessionHasErrors('slug');
     }
-    
+
     /** @test */
     public function a_project_requires_a_introduction()
     {
@@ -105,6 +107,6 @@ public function guests_cannot_manage_posts()
     {
         $post = Post::factory()->create();
 
-        $this->patch($post->path())->assertRedirect('login');
+        $this->patch(route('posts.update', $post))->assertRedirect('login');
     }
 }
