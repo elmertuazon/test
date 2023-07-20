@@ -24,10 +24,10 @@ class ManagePostsTest extends TestCase
     /** @test */
     public function a_user_can_create_a_post()
     {
-        $this->withoutExceptionHandling();
-        $this->signIn();
-        $this->createAdmin();
-        $this->get('/posts/create')->assertStatus(200);
+        $this->signIn()->createAdmin();
+
+        $this->get(route('posts.create'))
+            ->assertStatus(200);
 
         $attributes = Post::factory()->make([
             'slug' => 'test-slug',
@@ -40,16 +40,21 @@ class ManagePostsTest extends TestCase
             ->assertSee($attributes['author_id']);
     }
 
+    /** @test */
     public function a_user_can_update_a_post()
     {
-        $user = $this->signIn();
-        $post = Post::factory()->create(['author_id' => $user->id]);
+        $this->signIn();
+        $post = Post::factory()->draft()->create(['author_id' => auth()->id()]);
+
+        $attributes = $post->only(['title', 'introduction', 'body', 'category_id']);
+        $attributes['title'] = 'Changed';
+
+        $this->get(route('posts.edit', $post))->assertOk();
 
         $this->actingAs($post->author)
-            ->patch($post->path(), $attributes = ['title' => 'Changed'])
+            ->patch(route('posts.update', $post), $attributes)
             ->assertRedirect(route('posts.show', $post));
 
-        $this->get($post->path().'/edit')->assertOk();
     }
 
     /** @test */

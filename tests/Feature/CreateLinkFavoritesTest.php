@@ -13,17 +13,17 @@ class CreateLinkFavoritesTest extends TestCase
     /** @test */
     public function a_user_can_favorite_a_link()
     {
-        $user = $this->signIn();
+        $this->signIn();
         $category = Category::factory()->create();
         $link = Link::factory()->create([
-            'author_id' => $user->id,
+            'author_id' => auth()->id(),
             'category_id' => $category->id
         ]);
 
-        $link->favorites()->create(['user_id'=>$user->id]);
+        $link->favorites()->create(['user_id'=> auth()->id()]);
 
         $this->assertDatabaseHas('favorites', [
-            'user_id' => $user->id,
+            'user_id' => auth()->id(),
             'favoritable_type' => get_class($link),
             'favoritable_id' => $link->id
         ]);

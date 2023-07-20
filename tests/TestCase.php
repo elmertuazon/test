@@ -16,7 +16,7 @@ abstract class TestCase extends BaseTestCase
 
         $this->actingAs($user);
 
-        return $user;
+        return $this;
     }
 
     protected function createAdmin()
@@ -26,6 +26,8 @@ abstract class TestCase extends BaseTestCase
             'email' => 'admin@blog.example',
             'password' => bcrypt('password'),
         ]);
+
+        return $this;
     }
 
     protected function signInAsAdmin($user = null)
