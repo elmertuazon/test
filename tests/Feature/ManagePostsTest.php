@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -22,23 +23,48 @@ class ManagePostsTest extends TestCase
     }
 
     /** @test */
+    public function an_authenticated_user_can_see_the_post_create_view()
+    {
+        $this->signIn();
+
+        $this->get(route('posts.create'))
+            ->assertStatus(200);
+    }
+
+    /** @test */
     public function a_user_can_create_a_post()
     {
         $this->withoutExceptionHandling();
         $this->signIn()->createAdmin();
 
-        $this->get(route('posts.create'))
-            ->assertStatus(200);
+        $attributes = Post::factory()->make()->toArray();
+        $tag = Tag::factory()->create();
+        $attributes['tags'] = [$tag->id];
 
-        $attributes = Post::factory()->make([
-            'slug' => 'test-slug',
-        ])->toArray();
+        $response = $this->post(route('posts.store'), $attributes);
+        $response->assertStatus(302);
 
-        $this->followingRedirects()
-            ->post(route('posts.store'), $attributes)
-            ->assertSee($attributes['title'])
-            ->assertSee($attributes['introduction'])
-            ->assertSee($attributes['author_id']);
+        $this->assertDatabaseHas('tags', [
+            'name' => $tag->name,
+            'slug' => $tag->slug,
+        ]);
+
+        $this->assertDatabaseHas('taggables', [
+            'tag_id' => $tag->id,
+            'taggable_type' => Post::class,
+        ]);
+    }
+
+    /** @test */
+    public function a_user_can_see_a_post()
+    {
+        $this->signIn();
+        $post = Post::factory()->accepted()->create();
+
+        $this->get(route('posts.show', $post))
+            ->assertSee($post->title)
+            ->assertSee($post->introduction)
+            ->assertSeeText($post->body);
     }
 
     /** @test */

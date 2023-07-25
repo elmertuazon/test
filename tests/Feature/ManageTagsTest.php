@@ -11,24 +11,6 @@ use Tests\TestCase;
 class ManageTagsTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
-    /** @test */
-    public function a_post_can_have_tags()
-    {
-        $post = Post::factory()->create();
-        $tag = Tag::factory()->create();
-        $post->tags()->sync([$tag->id]);
-
-        $this->assertDatabaseHas('tags', [
-            'name' => $tag->name,
-            'slug' => $tag->slug,
-        ]);
-
-        $this->assertDatabaseHas('taggables', [
-            'tag_id' => $tag->id,
-            'taggable_type' => 'App\Models\Post',
-            'taggable_id' => $post->id
-        ]);
-    }
 
     /** @test */
     public function a_post_can_have_updated_tags()

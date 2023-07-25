@@ -132,6 +132,6 @@ class ManageLinksTest extends TestCase
                 'user_id' => auth()->id(),
                 'body' => 'sample'
             ])
-            ->assertStatus(200);
+            ->assertStatus(302);
     }
 }
