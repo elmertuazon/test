@@ -41,6 +41,12 @@ class ManageCommentsTest extends TestCase
     {
         // Feature tests *have* to make http requests to your application.
         // Unit tests *cannot* make http requests to your application.
+        // A feature test should test one controller method only
+        // A unit test should test one method only
+        // The three stages of a test are
+        // ARRANGE - set up what you need to test
+        // ACT - take the action you want to test
+        // ASSERT - make sure the action you took had the intended effect
 
         // ARRANGE - set up what you need to test
         // Create the comment we want to reply to
