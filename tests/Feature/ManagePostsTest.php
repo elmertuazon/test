@@ -24,6 +24,7 @@ class ManagePostsTest extends TestCase
     /** @test */
     public function a_user_can_create_a_post()
     {
+        $this->withoutExceptionHandling();
         $this->signIn()->createAdmin();
 
         $this->get(route('posts.create'))
@@ -34,7 +35,7 @@ class ManagePostsTest extends TestCase
         ])->toArray();
 
         $this->followingRedirects()
-            ->post('/posts', $attributes)
+            ->post(route('posts.store'), $attributes)
             ->assertSee($attributes['title'])
             ->assertSee($attributes['introduction'])
             ->assertSee($attributes['author_id']);

@@ -19,7 +19,7 @@ class PostsController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:view,post')->only('show');
+        $this->middleware('can:view,post')->only(['show']);
         $this->middleware('can:update,post')->only(['edit', 'update']);
     }
 

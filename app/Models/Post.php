@@ -24,6 +24,7 @@ class Post extends Model
     protected $casts = [
         'publish_at' => 'datetime',
         'favorited' => 'boolean',
+        'author_id' => 'integer'
     ];
 
 
