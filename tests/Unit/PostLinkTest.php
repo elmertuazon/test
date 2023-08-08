@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Category;
 use App\Models\Link;
+use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,11 +18,7 @@ class PostLinkTest extends TestCase
     public function a_user_can_favorite_a_link()
     {
         $this->signIn();
-        $category = Category::factory()->create();
-        $link = Link::factory()->create([
-            'author_id' => auth()->id(),
-            'category_id' => $category->id
-        ]);
+        $link = Link::factory()->create();
 
         $link->favorites()->create(['user_id'=> auth()->id()]);
 
@@ -33,7 +30,6 @@ class PostLinkTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $link->favorites);
         $this->assertEquals(1, $link->favorites->count());
-
     }
 
     /** @test */
@@ -116,5 +112,17 @@ class PostLinkTest extends TestCase
             'taggable_type' => 'App\Models\Link',
             'taggable_id' => $link->id
         ]);
+    }
+
+    /** @test */
+    public function a_post_can_have_tags_as_links()
+    {
+        $link = Link::factory()->create();
+        $tags = Tag::factory(3)->create();
+        $link->tags()->sync($tags->pluck('id'));
+        $tagsAsLinks = $link->tagsAsLinks();
+        $this->assertEquals($tagsAsLinks, ($tags->map(function ($tag) {
+            return '<a href="' . route('tag.show', $tag) . '">#' . $tag->name . '</a>';
+        })->implode(', ')));
     }
 }
