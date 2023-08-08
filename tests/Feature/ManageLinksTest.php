@@ -12,35 +12,27 @@ use Tests\TestCase;
 class ManageLinksTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
+
     /** @test */
-    public function link_can_have_a_comment()
+    public function link_show_list_page()
     {
         $this->signIn();
-        $category = Category::factory()->create();
-        $link = Link::factory()->create([
-            'author_id' => auth()->id(),
-            'category_id' => $category->id
-        ]);
-        $link->comments()->create([
-            'user_id' => auth()->id(),
-            'body' => 'sample link'
-        ]);
-
-        $this->assertDatabaseHas('links', [
-            'title' => $link->title,
-            'introduction' => $link->introduction,
-        ]);
-
-        $this->assertDatabaseHas('comments', [
-            'user_id' => auth()->id(),
-            'body' => 'sample link',
-            'commentable_type' => 'App\Models\Link',
-            'commentable_id' => $link->id
-        ]);
+        $this->actingAs(auth()->user())
+            ->get(route('links.index', ['month' => '2021-01']),)
+            ->assertStatus(200);
     }
 
     /** @test */
-    public function link_can_have_tags()
+    public function link_show_my_list()
+    {
+        $this->signIn();
+        $this->actingAs(auth()->user())
+            ->get(route('user.links'))
+            ->assertStatus(200);
+    }
+
+    /** @test */
+    public function link_show_a_post_page()
     {
         $this->signIn();
         $category = Category::factory()->create();
@@ -48,14 +40,9 @@ class ManageLinksTest extends TestCase
             'author_id' => auth()->id(),
             'category_id' => $category->id
         ]);
-        $tag = Tag::factory()->create();
-        $link->tags()->sync([$tag->id]);
-
-        $this->assertDatabaseHas('taggables', [
-            'tag_id' => $tag->id,
-            'taggable_type' => 'App\Models\Link',
-            'taggable_id' => $link->id
-        ]);
+        $this->actingAs(auth()->user())
+            ->get(route('links.show', $link))
+            ->assertStatus(200);
     }
 
     /** @test */
@@ -65,6 +52,23 @@ class ManageLinksTest extends TestCase
         $this->actingAs(auth()->user())
             ->get(route('links.create'))
             ->assertStatus(200);
+    }
+
+    /** @test */
+    public function link_can_be_stored()
+    {
+        $this->signIn();
+        $attributes = Link::factory()->make()->toArray();
+        $tag = Tag::factory()->create();
+        $attributes['tags'] = [$tag->id];
+        $this->actingAs(auth()->user())
+            ->post(route('links.store'), $attributes)
+            ->assertStatus(302);
+        
+        $this->assertDatabaseHas('links', [
+            'title' => $attributes['title'],
+            'introduction' => $attributes['introduction']
+        ]);
     }
 
     /** @test */
@@ -82,39 +86,24 @@ class ManageLinksTest extends TestCase
     }
 
     /** @test */
-    public function link_can_be_update()
+    public function link_can_be_updated()
     {
         $this->signIn();
-        $category = Category::factory()->create();
-        $link = Link::factory()->create([
-            'author_id' => auth()->id(),
-            'category_id' => $category->id
-        ]);
-        $tags = Tag::factory(2)->create();
-        $link->tags()->sync([$tags[0]->id]);
+        // $attributes = Link::factory()->make()->toArray();
+        // $tag = Tag::factory()->create();
+        // $attributes['tags'] = [$tag->id];
 
-        $this->assertDatabaseHas('tags', [
-            'name' => $tags[0]->name,
-            'slug' => $tags[0]->slug,
-        ]);
-        $this->assertDatabaseHas('tags', [
-            'name' => $tags[1]->name,
-            'slug' => $tags[1]->slug,
-        ]);
+        $link = Link::factory()->draft()->create(['author_id' => auth()->id()]);
+        $attributes = $link->only(['title', 'introduction', 'url', 'category_id']);
+        $attributes['title'] = 'Changed';
 
-        $link->tags()->sync([$tags[1]->id]);
-
-        $this->assertDatabaseMissing('taggables', [
-            'tag_id' => $tags[0]->id,
-            'taggable_type' => 'App\Models\Link',
-            'taggable_id' => $link->id
-        ]);
-
-        $this->assertDatabaseHas('taggables', [
-            'tag_id' => $tags[1]->id,
-            'taggable_type' => 'App\Models\Link',
-            'taggable_id' => $link->id
-        ]);
+        // $this->actingAs(auth()->user())
+        //     ->post(route('links.store'), $attributes)
+        //     ->assertStatus(302);
+        
+        $this->actingAs($link->author)
+        ->patch(route('links.update', $link), $attributes)
+        ->assertRedirect(route('links.show', $link));
     }
 
     /** @test */
@@ -133,5 +122,36 @@ class ManageLinksTest extends TestCase
                 'body' => 'sample'
             ])
             ->assertStatus(302);
+    }
+
+    /** @test */
+    public function link_can_be_favorited()
+    {
+        $this->signIn();
+        $category = Category::factory()->create();
+        $link = Link::factory()->create([
+            'author_id' => auth()->id(),
+            'category_id' => $category->id,
+            'status' => 'accepted'
+        ]);
+        $this->actingAs(auth()->user())
+            ->post(route('user.links.favorite', $link))
+            ->assertStatus(302);
+        
+        $this->assertDatabaseHas('favorites', [
+            'user_id' => $link->author->id,
+            'favoritable_type' => get_class($link),
+            'favoritable_id' => $link->id
+        ]);
+
+        $this->actingAs(auth()->user())
+            ->post(route('user.links.favorite', $link))
+            ->assertStatus(302);
+
+        $this->assertDatabaseMissing('favorites', [
+            'user_id' => $link->author->id,
+            'favoritable_type' => get_class($link),
+            'favoritable_id' => $link->id
+        ]);
     }
 }

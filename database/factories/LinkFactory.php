@@ -25,4 +25,13 @@ class LinkFactory extends Factory
             'status' => $this->faker->randomElement(['draft', 'accepted'])
         ];
     }
+
+    public function draft()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => 'draft',
+            ];
+        });
+    }
 }

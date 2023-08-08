@@ -1,17 +1,20 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use App\Models\Category;
 use App\Models\Link;
+use App\Models\Tag;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class CreateLinkFavoritesTest extends TestCase
+class TagTest extends TestCase
 {
     use RefreshDatabase;
+
     /** @test */
-    public function a_user_can_favorite_a_link()
+    public function tags_can_have_link()
     {
         $this->signIn();
         $category = Category::factory()->create();
@@ -19,14 +22,12 @@ class CreateLinkFavoritesTest extends TestCase
             'author_id' => auth()->id(),
             'category_id' => $category->id
         ]);
-
-        $link->favorites()->create(['user_id'=> auth()->id()]);
-
-        $this->assertDatabaseHas('favorites', [
-            'user_id' => auth()->id(),
-            'favoritable_type' => get_class($link),
-            'favoritable_id' => $link->id
-        ]);
-
+        $tag = Tag::factory()->create();
+        $link->tags()->sync([$tag->id]);
+        
+        foreach($link->tags as $tag) 
+        {
+            $this->assertInstanceOf(Collection::class, $tag->links);
+        }
     }
 }

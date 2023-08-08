@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Mail\PostStatusUpdated;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class ManagePostsTest extends TestCase
@@ -20,6 +23,24 @@ class ManagePostsTest extends TestCase
         $this->get(route('posts.create'))->assertRedirect('login');
         $this->get(route('posts.edit', $post))->assertRedirect('login');
         $this->get(route('posts.show', $post))->assertSee($post->title);
+    }
+
+    /** @test */
+    public function post_show_list_page()
+    {
+        $this->signIn();
+        $this->actingAs(auth()->user())
+            ->get(route('home', ['month' => '2021-01']))
+            ->assertStatus(200);
+    }
+
+    /** @test */
+    public function post_show_my_posts()
+    {
+        $this->signIn();
+        $this->actingAs(auth()->user())
+            ->get(route('user.posts'))
+            ->assertStatus(200);
     }
 
     /** @test */
@@ -43,7 +64,6 @@ class ManagePostsTest extends TestCase
 
         $response = $this->post(route('posts.store'), $attributes);
         $response->assertStatus(302);
-
         $this->assertDatabaseHas('tags', [
             'name' => $tag->name,
             'slug' => $tag->slug,
@@ -72,9 +92,10 @@ class ManagePostsTest extends TestCase
     {
         $this->signIn();
         $post = Post::factory()->draft()->create(['author_id' => auth()->id()]);
-
-        $attributes = $post->only(['title', 'introduction', 'body', 'category_id']);
+        
+        $attributes = $post->only(['title', 'introduction', 'body', 'category_id', 'status']);
         $attributes['title'] = 'Changed';
+        $attributes['status'] = 'accepted';
 
         $this->get(route('posts.edit', $post))->assertOk();
 
@@ -140,5 +161,32 @@ class ManagePostsTest extends TestCase
         $post = Post::factory()->create();
 
         $this->patch(route('posts.update', $post))->assertRedirect('login');
+    }
+
+    /** @test */
+    public function a_post_can_be_favorited()
+    {
+        $this->signIn();
+        $post = Post::factory()->create();
+
+        $this->actingAs($post->author)
+            ->post(route('user.posts.favorite', $post))
+            ->assertStatus(302);
+        
+        $this->assertDatabaseHas('favorites', [
+            'user_id' => $post->author->id,
+            'favoritable_type' => get_class($post),
+            'favoritable_id' => $post->id
+        ]);
+
+        $this->actingAs($post->author)
+            ->post(route('user.posts.favorite', $post))
+            ->assertStatus(302);
+
+        $this->assertDatabaseMissing('favorites', [
+            'user_id' => $post->author->id,
+            'favoritable_type' => get_class($post),
+            'favoritable_id' => $post->id
+        ]);
     }
 }

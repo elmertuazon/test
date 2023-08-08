@@ -24,11 +24,6 @@ class Comment extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
-    public function post(): BelongsTo
-    {
-        return $this->belongsTo(Post::class);
-    }
-
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

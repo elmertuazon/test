@@ -12,11 +12,6 @@ class Favorite extends Model
 {
     protected $guarded = ['id'];
 
-    public function post(): BelongsTo
-    {
-        return $this->belongsTo(Post::class);
-    }
-
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

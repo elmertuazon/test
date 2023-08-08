@@ -18,4 +18,15 @@ class ManageCategoriesTest extends TestCase
         $this->get($category->path())->assertOk();
 
     }
+
+    /** @test */
+    public function crud_user_can_see_categories()
+    {
+        $user = $this->createAdmin();
+
+        $this->actingAs(auth()->user())
+            ->get(config('backpack.base.route_prefix') . '/category')
+            ->assertStatus(302);
+
+    }
 }
