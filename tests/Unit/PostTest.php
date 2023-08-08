@@ -34,7 +34,7 @@ class PostTest extends TestCase
         }
     }
 
-    
+    /** @test */
     public function a_post_can_have_tags_as_links()
     {
         $post = Post::factory()->create();

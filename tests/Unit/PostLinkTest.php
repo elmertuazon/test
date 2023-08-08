@@ -31,6 +31,9 @@ class PostLinkTest extends TestCase
             'favoritable_id' => $link->id
         ]);
 
+        $this->assertInstanceOf(Collection::class, $link->favorites);
+        $this->assertEquals(1, $link->favorites->count());
+
     }
 
     /** @test */
@@ -77,22 +80,6 @@ class PostLinkTest extends TestCase
             'taggable_type' => 'App\Models\Link',
             'taggable_id' => $link->id
         ]);
-    }
-
-    /** @test */
-    public function a_link_has_favorites()
-    {
-        $this->signIn();
-        $category = Category::factory()->create();
-        $links = Link::factory(3)->create([
-            'author_id' => auth()->id(),
-            'category_id' => $category->id
-        ]);
-        foreach($links as $link)
-        {
-            $link->favorites()->create(['user_id' => auth()->id()]);
-        }
-        $this->assertInstanceOf(Collection::class, $link->favorites);
     }
 
     /** @test */

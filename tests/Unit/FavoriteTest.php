@@ -20,7 +20,7 @@ class FavoriteTest extends TestCase
         $user = $this->signIn();
         $post = Post::factory()->create(['author_id' => auth()->id()]);
         $favorite = $post->favorites()->create(['user_id' => auth()->id()]);
-        // $this->assertInstanceOf(User::class, $favorite->author);
+        $this->assertInstanceOf(User::class, $favorite->author);
         $this->assertInstanceOf(Post::class, $favorite->favoritable);
     }
 
