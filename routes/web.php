@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-posts', UserPostController::class)->name('user.posts');
 
 
-    Route::resource('links', LinksController::class)->except(['destroy']);
+    Route::resource('links', LinksController::class)->except(['show', 'destroy']);
     Route::post('links/{link}/comments', CreateLinkCommentController::class)->name('user.links.comments');
     Route::post('links/{link}/favorite', CreateLinkFavoriteController::class)->name('user.links.favorite');
     Route::get('/my-links', UserLinksController::class)->name('user.links');
@@ -51,5 +51,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/posts/{post}', [PostsController::class, 'show'])->name('posts.show');
+Route::get('/links/{link}', [LinksController::class, 'show'])->name('links.show');
 
 Auth::routes();

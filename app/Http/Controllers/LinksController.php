@@ -44,7 +44,7 @@ class LinksController extends Controller
     public function show(Link $link)
     {
         $link->load('category', 'tags', 'author', 'comments.author', 'comments.comments.author');
-        
+
         if(auth()->check()) {
             $link->loadFavorited(auth()->id());
         }

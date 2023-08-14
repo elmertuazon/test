@@ -17,9 +17,12 @@ class ManageLinksTest extends TestCase
     public function guests_cannot_manage_links()
     {
         $link = Link::factory()->accepted()->create();
+
+
         $this->post(route('links.store'), $link->toArray())->assertRedirect('login');
         $this->get(route('links.create'))->assertRedirect('login');
         $this->get(route('links.edit', $link))->assertRedirect('login');
+
         $this->get(route('links.show', $link))->assertSee($link->title);
     }
 
@@ -46,7 +49,7 @@ class ManageLinksTest extends TestCase
     {
         $this->signIn();
         $category = Category::factory()->create();
-        
+
         $link = Link::factory()->create([
             'author_id' => auth()->id(),
             'category_id' => $category->id
@@ -54,7 +57,7 @@ class ManageLinksTest extends TestCase
         $this->actingAs(auth()->user())
             ->get(route('links.show', $link))
             ->assertStatus(200);
-        
+
         $this->get(route('links.show', $link))
             ->assertStatus(200);
     }
@@ -78,7 +81,7 @@ class ManageLinksTest extends TestCase
         $this->actingAs(auth()->user())
             ->post(route('links.store'), $attributes)
             ->assertStatus(302);
-        
+
         $this->assertDatabaseHas('links', [
             'title' => $attributes['title'],
             'introduction' => $attributes['introduction']
@@ -110,7 +113,7 @@ class ManageLinksTest extends TestCase
         $link = Link::factory()->draft()->create(['author_id' => auth()->id()]);
         $attributes = $link->only(['title', 'introduction', 'url', 'category_id']);
         $attributes['title'] = 'Changed';
-        
+
         $this->actingAs($link->author)
         ->patch(route('links.update', $link), $attributes)
         ->assertRedirect(route('links.show', $link));
@@ -147,7 +150,7 @@ class ManageLinksTest extends TestCase
         $this->actingAs(auth()->user())
             ->post(route('user.links.favorite', $link))
             ->assertStatus(302);
-        
+
         $this->assertDatabaseHas('favorites', [
             'user_id' => $link->author->id,
             'favoritable_type' => get_class($link),

@@ -15,13 +15,13 @@ class LinkPolicy
         $isTheLinkPublished = $link->publish_at <= now();
 
         $isTheLinkAccepted = $link->status === 'accepted';
-        
+
         if($user === null) {
             return $isTheLinkPublished && $isTheLinkAccepted;
         }
 
         $isTheLinkInDraftOrDeclinedAndTheUserIsTheAuthor = in_array($link->status, ['draft', 'declined']) && $user->id == $link->author_id;
-        
+
         return $isTheLinkPublished && ($isTheLinkAccepted || $isTheLinkInDraftOrDeclinedAndTheUserIsTheAuthor);
     }
 
