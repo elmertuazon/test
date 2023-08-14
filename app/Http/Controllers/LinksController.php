@@ -15,6 +15,12 @@ use Illuminate\View\View;
 
 class LinksController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:view,link')->only(['show']);
+        $this->middleware('can:update,link')->only(['edit', 'update']);
+    }
+
     public function index(Request $request)
     {
         $links = Link::with('category', 'tags', 'author')
@@ -38,13 +44,12 @@ class LinksController extends Controller
     public function show(Link $link)
     {
         $link->load('category', 'tags', 'author', 'comments.author', 'comments.comments.author');
-
+        
         if(auth()->check()) {
             $link->loadFavorited(auth()->id());
         }
 
         $link->increment('popularity');
-
         return view('links.show', compact('link'));
     }
 

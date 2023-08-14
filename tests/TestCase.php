@@ -22,12 +22,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function createAdmin()
     {
-        $user = Admin::create([
-            'name' => 'Admin',
-            'email' => 'admin@blog.example',
-            'password' => bcrypt('password'),
-        ]);
-        $this->actingAs($user);
+        $this->signInAsAdmin();
 
         return $this;
     }
@@ -40,7 +35,7 @@ abstract class TestCase extends BaseTestCase
             'password' => bcrypt('password'),
         ]);
 
-        $this->actingAs($user);
+        $this->actingAs($user, 'backpack');
 
         return $user;
     }

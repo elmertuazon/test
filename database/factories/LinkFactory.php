@@ -34,4 +34,13 @@ class LinkFactory extends Factory
             ];
         });
     }
+
+    public function accepted()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => 'accepted',
+            ];
+        });
+    }
 }

@@ -62,6 +62,15 @@ class PostTest extends TestCase
     }
 
     /** @test */
+    public function a_user_can_have_post()
+    {
+        $this->signIn();
+        Post::factory()->create(['author_id' => auth()->id()]);
+        
+        $this->assertInstanceOf(Collection::class, auth()->user()->posts);
+    }
+
+    /** @test */
     public function a_post_has_favorites()
     {
         $user = $this->signIn();

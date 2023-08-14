@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\PostCreated;
 use App\Mail\PostStatusUpdated;
 use App\Models\Post;
 use App\Models\Tag;
@@ -64,6 +65,7 @@ class ManagePostsTest extends TestCase
 
         $response = $this->post(route('posts.store'), $attributes);
         $response->assertStatus(302);
+        
         $this->assertDatabaseHas('tags', [
             'name' => $tag->name,
             'slug' => $tag->slug,
@@ -73,6 +75,22 @@ class ManagePostsTest extends TestCase
             'tag_id' => $tag->id,
             'taggable_type' => Post::class,
         ]);
+    }
+
+    /** @test */
+    public function a_post_will_send_mail()
+    {
+        $this->withoutExceptionHandling();
+        $this->signIn()->createAdmin();
+        Mail::fake();
+
+        $attributes = Post::factory()->make()->toArray();
+        $tag = Tag::factory()->create();
+        $attributes['tags'] = [$tag->id];
+
+        $this->post(route('posts.store'), $attributes);
+        
+        Mail::assertQueued(PostCreated::class);
     }
 
     /** @test */
@@ -103,6 +121,25 @@ class ManagePostsTest extends TestCase
             ->patch(route('posts.update', $post), $attributes)
             ->assertRedirect(route('posts.show', $post));
 
+    }
+
+    /** @test */
+    public function a_user_can_send_update_mail()
+    {
+        $this->signIn();
+        $post = Post::factory()->draft()->create(['author_id' => auth()->id()]);
+        Mail::fake();
+        $attributes = $post->only(['title', 'introduction', 'body', 'category_id', 'status']);
+        $attributes['title'] = 'Changed';
+        $attributes['status'] = 'accepted';
+
+        $this->get(route('posts.edit', $post))->assertOk();
+
+        $this->actingAs($post->author)
+            ->patch(route('posts.update', $post), $attributes);
+        
+        Mail::assertQueued(PostStatusUpdated::class);
+        
     }
 
     /** @test */
@@ -189,4 +226,5 @@ class ManagePostsTest extends TestCase
             'favoritable_id' => $post->id
         ]);
     }
+
 }

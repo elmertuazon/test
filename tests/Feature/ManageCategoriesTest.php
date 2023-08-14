@@ -22,11 +22,12 @@ class ManageCategoriesTest extends TestCase
     /** @test */
     public function crud_user_can_see_categories()
     {
-        $user = $this->createAdmin();
+        $this->withoutExceptionHandling();
+        $user = $this->signInAsAdmin();
 
         $this->actingAs(auth()->user())
-            ->get(config('backpack.base.route_prefix') . '/category')
-            ->assertStatus(302);
+            ->get(route('category.index'))
+            ->assertStatus(200);
 
     }
 }
