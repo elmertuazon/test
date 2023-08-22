@@ -54,6 +54,11 @@ class PostCrudController extends CrudController
         ]);
 
         $this->crud->addColumn([
+            'name' => 'slug',
+            'limit' => 50,
+        ]);
+
+        $this->crud->addColumn([
             'name' => 'introduction',
             'limit' => 50,
         ]);
@@ -105,6 +110,10 @@ class PostCrudController extends CrudController
 
         $this->crud->addField([
             'name' => 'title'
+        ]);
+
+        $this->crud->addField([
+            'name' => 'slug'
         ]);
 
         $this->crud->addField([

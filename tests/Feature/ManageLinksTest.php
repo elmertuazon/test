@@ -7,6 +7,7 @@ use App\Models\Link;
 use App\Models\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ManageLinksTest extends TestCase
@@ -32,6 +33,18 @@ class ManageLinksTest extends TestCase
         $this->signIn();
         $this->actingAs(auth()->user())
             ->get(route('links.index', ['month' => '2021-01']),)
+            ->assertStatus(200);
+    }
+
+    /** @test */
+    public function link_edit_page()
+    {
+        $this->signIn();
+        $link = Link::factory()->draft()->create([
+            'author_id' => auth()->id()
+        ]);
+        $this->actingAs(auth()->user())
+            ->get(route('links.edit', $link))
             ->assertStatus(200);
     }
 
@@ -76,12 +89,15 @@ class ManageLinksTest extends TestCase
     {
         $this->signIn();
         $attributes = Link::factory()->make()->toArray();
+        Storage::fake(storage_path('uploads'));
         $tag = Tag::factory()->create();
         $attributes['tags'] = [$tag->id];
+        $attributes['image'] = new \Illuminate\Http\UploadedFile(storage_path('uploads/ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png'), 'ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png', null, null, true);
         $this->actingAs(auth()->user())
             ->post(route('links.store'), $attributes)
             ->assertStatus(302);
-
+        $uploaded = storage_path('uploads').'/ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png';
+        $this->assertFileExists($uploaded);
         $this->assertDatabaseHas('links', [
             'title' => $attributes['title'],
             'introduction' => $attributes['introduction']

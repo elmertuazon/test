@@ -30,4 +30,31 @@ class ManageCategoriesTest extends TestCase
             ->assertStatus(200);
 
     }
+
+    /** @test */
+    public function crud_user_can_create_categories()
+    {
+        $this->withoutExceptionHandling();
+        $this->createAdmin();
+        $attributes = Category::factory()->make()->toArray();
+
+        $this->actingAs(auth()->user())
+            ->post(route('category.store'), $attributes)
+            ->assertStatus(302);
+    }
+
+    /** @test */
+    public function crud_user_can_update_categories()
+    {
+        $this->withoutExceptionHandling();
+        $this->createAdmin();
+        $category = Category::factory()->create();
+        $attributes = $category->only(['name', 'slug']);
+        $attributes['name'] = 'changed';
+
+        $this->actingAs(auth()->user())
+            ->put(route('category.update', $category), $attributes)
+            ->assertStatus(302);
+
+    }
 }

@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ManagePostsTest extends TestCase
@@ -58,18 +59,19 @@ class ManagePostsTest extends TestCase
     {
         $this->withoutExceptionHandling();
         $this->signIn()->createAdmin();
-
         $attributes = Post::factory()->make()->toArray();
+        Storage::fake(storage_path('uploads'));
         $tag = Tag::factory()->create();
         $attributes['tags'] = [$tag->id];
-
+        $attributes['image'] = new \Illuminate\Http\UploadedFile(storage_path('uploads/ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png'), 'ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png', null, null, true);
         $response = $this->post(route('posts.store'), $attributes);
         $response->assertStatus(302);
-        
         $this->assertDatabaseHas('tags', [
             'name' => $tag->name,
             'slug' => $tag->slug,
         ]);
+        $uploaded = storage_path('uploads').'/ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png';
+        $this->assertFileExists($uploaded);
 
         $this->assertDatabaseHas('taggables', [
             'tag_id' => $tag->id,
@@ -98,7 +100,6 @@ class ManagePostsTest extends TestCase
     {
         $this->signIn();
         $post = Post::factory()->accepted()->create();
-
         $this->get(route('posts.show', $post))
             ->assertSee($post->title)
             ->assertSee($post->introduction)
@@ -225,6 +226,45 @@ class ManagePostsTest extends TestCase
             'favoritable_type' => get_class($post),
             'favoritable_id' => $post->id
         ]);
+    }
+
+    /** @test */
+    public function crud_user_can_see_post()
+    {
+        $this->withoutExceptionHandling();
+        $user = $this->signInAsAdmin();
+
+        $this->actingAs(auth()->user())
+            ->get(route('post.index'))
+            ->assertStatus(200);
+
+    }
+
+    /** @test */
+    public function crud_user_can_create_post()
+    {
+        $this->withoutExceptionHandling();
+        $this->createAdmin();
+        $attributes = Post::factory()->make()->toArray();
+
+        $this->actingAs(auth()->user())
+            ->post(route('post.store'), $attributes)
+            ->assertStatus(302);
+    }
+
+    /** @test */
+    public function crud_user_can_update_post()
+    {
+        $this->withoutExceptionHandling();
+        $this->createAdmin();
+        $post = Post::factory()->create();
+        $attributes = $post->except(['id']);
+        $attributes['name'] = 'changed';
+
+        $this->actingAs(auth()->user())
+            ->put(route('post.update', $post), $attributes)
+            ->assertStatus(302);
+
     }
 
 }

@@ -20,4 +20,43 @@ class ManageTagsTest extends TestCase
             ->assertStatus(200);
     }
 
+    /** @test */
+    public function crud_user_can_see_tag()
+    {
+        $this->withoutExceptionHandling();
+        $user = $this->signInAsAdmin();
+
+        $this->actingAs(auth()->user())
+            ->get(route('tag.index'))
+            ->assertStatus(200);
+
+    }
+
+    /** @test */
+    public function crud_user_can_create_tag()
+    {
+        $this->withoutExceptionHandling();
+        $this->createAdmin();
+        $attributes = Tag::factory()->make()->toArray();
+
+        $this->actingAs(auth()->user())
+            ->post(route('tag.store'), $attributes)
+            ->assertStatus(302);
+    }
+
+    /** @test */
+    public function crud_user_can_update_tag()
+    {
+        $this->withoutExceptionHandling();
+        $this->createAdmin();
+        $tag = Tag::factory()->create();
+        $attributes = $tag->except(['id']);
+        $attributes['name'] = 'changed';
+
+        $this->actingAs(auth()->user())
+            ->put(route('tag.update', $tag), $attributes)
+            ->assertStatus(302);
+
+    }
+
 }
