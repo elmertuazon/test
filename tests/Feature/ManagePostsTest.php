@@ -6,9 +6,9 @@ use App\Mail\PostCreated;
 use App\Mail\PostStatusUpdated;
 use App\Models\Post;
 use App\Models\Tag;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -57,26 +57,79 @@ class ManagePostsTest extends TestCase
     /** @test */
     public function a_user_can_create_a_post()
     {
+        Storage::fake();
         $this->withoutExceptionHandling();
         $this->signIn()->createAdmin();
-        $attributes = Post::factory()->make()->toArray();
-        Storage::fake(storage_path('uploads'));
+
+        $postData = Post::factory()->make()->toArray();
         $tag = Tag::factory()->create();
-        $attributes['tags'] = [$tag->id];
-        $attributes['image'] = new \Illuminate\Http\UploadedFile(storage_path('uploads/ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png'), 'ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png', null, null, true);
-        $response = $this->post(route('posts.store'), $attributes);
+        $postData['tags'] = [$tag->id];
+        $postData['image'] = UploadedFile::fake()->image('cover.jpg', 200, 200);
+
+        $response = $this->post(route('posts.store'), $postData);
         $response->assertStatus(302);
         $this->assertDatabaseHas('tags', [
             'name' => $tag->name,
             'slug' => $tag->slug,
         ]);
-        $uploaded = storage_path('uploads').'/ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png';
-        $this->assertFileExists($uploaded);
+
+        Storage::assertExists('uploads/' .$postData['image']->hashName());
 
         $this->assertDatabaseHas('taggables', [
             'tag_id' => $tag->id,
             'taggable_type' => Post::class,
         ]);
+    }
+
+    /** @test */
+    public function post_created_image_has_validation()
+    {
+        Storage::fake();
+        $this->signIn()->createAdmin();
+
+        $postData = Post::factory()->make()->toArray();
+        $tag = Tag::factory()->create();
+        $postData['tags'] = [$tag->id];
+
+        // Testing image width min 100px
+        $postData['image'] = UploadedFile::fake()->image('cover.jpg', 50, 200);
+        $this->post(route('posts.store'), $postData)
+        ->assertSessionHasErrors('image');
+        Storage::assertMissing('uploads/' .$postData['image']->hashName());
+
+        // Testing image width max 1000px
+        $postData['image'] = UploadedFile::fake()->image('cover.jpg', 1050, 200);
+        $this->post(route('posts.store'), $postData)
+            ->assertSessionHasErrors('image');
+        Storage::assertMissing('uploads/' .$postData['image']->hashName());
+
+        // Testing image height min 100px
+        $postData['image'] = UploadedFile::fake()->image('cover.jpg', 200, 50);
+        $this->post(route('posts.store'), $postData)
+            ->assertSessionHasErrors('image');
+        Storage::assertMissing('uploads/' .$postData['image']->hashName());
+
+        // Testing image height max 1000px
+        $postData['image'] = UploadedFile::fake()->image('cover.jpg', 200, 1050);
+        $this->post(route('posts.store'), $postData)
+            ->assertSessionHasErrors('image');
+        Storage::assertMissing('uploads/' .$postData['image']->hashName());
+
+        // Testing valid image dimension
+        $postData['image'] = UploadedFile::fake()->image('cover.jpg', 200, 200);
+        $this->post(route('posts.store'), $postData)
+            ->assertSessionMissing('image');
+        Storage::assertExists('uploads/' .$postData['image']->hashName());
+
+        // Testing uploaded file is an image
+        $postData['image'] = "test";
+        $this->post(route('posts.store'), $postData)
+            ->assertSessionHasErrors('image');
+
+        // Testing uploaded file is a jpg or png
+        $postData['image'] = UploadedFile::fake()->create('test.pdf', 200, 200);
+        $this->post(route('posts.store'), $postData)
+            ->assertSessionHasErrors('image');
     }
 
     /** @test */
@@ -91,7 +144,7 @@ class ManagePostsTest extends TestCase
         $attributes['tags'] = [$tag->id];
 
         $this->post(route('posts.store'), $attributes);
-        
+
         Mail::assertQueued(PostCreated::class);
     }
 
@@ -111,7 +164,7 @@ class ManagePostsTest extends TestCase
     {
         $this->signIn();
         $post = Post::factory()->draft()->create(['author_id' => auth()->id()]);
-        
+
         $attributes = $post->only(['title', 'introduction', 'body', 'category_id', 'status']);
         $attributes['title'] = 'Changed';
         $attributes['status'] = 'accepted';
@@ -138,9 +191,9 @@ class ManagePostsTest extends TestCase
 
         $this->actingAs($post->author)
             ->patch(route('posts.update', $post), $attributes);
-        
+
         Mail::assertQueued(PostStatusUpdated::class);
-        
+
     }
 
     /** @test */
@@ -210,7 +263,7 @@ class ManagePostsTest extends TestCase
         $this->actingAs($post->author)
             ->post(route('user.posts.favorite', $post))
             ->assertStatus(302);
-        
+
         $this->assertDatabaseHas('favorites', [
             'user_id' => $post->author->id,
             'favoritable_type' => get_class($post),
@@ -258,7 +311,7 @@ class ManagePostsTest extends TestCase
         $this->withoutExceptionHandling();
         $this->createAdmin();
         $post = Post::factory()->create();
-        $attributes = $post->except(['id']);
+        $attributes = $post->toArray();
         $attributes['name'] = 'changed';
 
         $this->actingAs(auth()->user())

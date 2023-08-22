@@ -49,7 +49,7 @@ class ManageCategoriesTest extends TestCase
         $this->withoutExceptionHandling();
         $this->createAdmin();
         $category = Category::factory()->create();
-        $attributes = $category->only(['name', 'slug']);
+        $attributes = $category->toArray();
         $attributes['name'] = 'changed';
 
         $this->actingAs(auth()->user())

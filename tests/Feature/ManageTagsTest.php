@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Post;
 use App\Models\Tag;
+use Arr;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -24,10 +25,9 @@ class ManageTagsTest extends TestCase
     public function crud_user_can_see_tag()
     {
         $this->withoutExceptionHandling();
-        $user = $this->signInAsAdmin();
+        $this->signInAsAdmin();
 
-        $this->actingAs(auth()->user())
-            ->get(route('tag.index'))
+        $this->get(route('tag.index'))
             ->assertStatus(200);
 
     }
@@ -36,11 +36,10 @@ class ManageTagsTest extends TestCase
     public function crud_user_can_create_tag()
     {
         $this->withoutExceptionHandling();
-        $this->createAdmin();
+        $this->signInAsAdmin();
         $attributes = Tag::factory()->make()->toArray();
 
-        $this->actingAs(auth()->user())
-            ->post(route('tag.store'), $attributes)
+        $this->post(route('tag.store'), $attributes)
             ->assertStatus(302);
     }
 
@@ -48,15 +47,14 @@ class ManageTagsTest extends TestCase
     public function crud_user_can_update_tag()
     {
         $this->withoutExceptionHandling();
-        $this->createAdmin();
+        $this->signInAsAdmin();
         $tag = Tag::factory()->create();
-        $attributes = $tag->except(['id']);
+
+        $attributes = $tag->toArray();
         $attributes['name'] = 'changed';
 
-        $this->actingAs(auth()->user())
-            ->put(route('tag.update', $tag), $attributes)
+        $this->put(route('tag.update', $tag), $attributes)
             ->assertStatus(302);
-
     }
 
 }

@@ -92,12 +92,9 @@ class ManageLinksTest extends TestCase
         Storage::fake(storage_path('uploads'));
         $tag = Tag::factory()->create();
         $attributes['tags'] = [$tag->id];
-        $attributes['image'] = new \Illuminate\Http\UploadedFile(storage_path('uploads/ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png'), 'ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png', null, null, true);
         $this->actingAs(auth()->user())
             ->post(route('links.store'), $attributes)
             ->assertStatus(302);
-        $uploaded = storage_path('uploads').'/ZLCL1rI5JLRMd04rY7KCQ3hBShEMxykXUgXFJaJf.png';
-        $this->assertFileExists($uploaded);
         $this->assertDatabaseHas('links', [
             'title' => $attributes['title'],
             'introduction' => $attributes['introduction']

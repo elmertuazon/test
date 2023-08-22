@@ -75,11 +75,6 @@ class Link extends Model
         $query->whereYear('publish_at', $searchYear)->whereMonth('publish_at', $searchMonth);
     }
 
-    public function setImageAttribute($image): void
-    {
-        $this->attributes['image'] = $image->store('uploads');
-    }
-
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');

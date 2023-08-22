@@ -31,7 +31,7 @@ class UpdatePostRequest extends FormRequest
              'body' => ['required', 'min:5'],
              'category_id' => ['required', 'exists:categories,id'],
              'status' => ['nullable', Rule::in(['draft', 'accepted'])],
-             'image' => ['nullable', 'image', 'bail', 'mimes:jpeg,png,jpg,gif,svg,webp', 'dimensions:min_width=100,max_width=1000,min_height=100,max_height=1000']
+             'image' => ['nullable', 'image', 'bail', 'mimes:jpeg,png,jpg', 'dimensions:min_width=100,max_width=1000,min_height=100,max_height=1000']
         ];
     }
 
